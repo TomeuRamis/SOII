@@ -364,49 +364,51 @@ int liberar_bloques_inodo(unsigned int ninodo, unsigned int nblogico){
     ptr = 0;
     for(nblog=nblogico; nblog <= ultimoBL; nblog++){//maybe <
         nRangoBL = obtener_nrangoBL(inodo,nblog,&ptr);
-        if (nRangoBL<0){
-            printf("He petao");
-            return -1;
-        }
-        nivel_punteros=nRangoBL;
-        while(ptr>0 && nivel_punteros<0){
-            bread(ptr, bloques_punteros[nivel_punteros-1]);
-            indice= obtener_indice(nblog, nivel_punteros);
-            ptr_nivel[nivel_punteros-1]=ptr;
-            indices[nivel_punteros-1]=indice;
-            ptr=bloques_punteros[nivel_punteros-1][indice];
-            nivel_punteros--;
-        }
-        if (ptr>0){
-            liberar_bloque(ptr);
-            liberados++;
-            //printf("Liberado BF %d de datos correspondiente al BL %d\n",ptr,nblogico);
-            if(nRangoBL == 0) {
-                inodo.punterosDirectos[nblog]=0;
-                salvar_inodo=1;
-            } else {
-                while (nivel_punteros<nRangoBL){
-                    indice=indices[nivel_punteros];
-                    bloques_punteros[nivel_punteros][indice]=0;
-                    ptr=ptr_nivel[nivel_punteros]; 
-                    if (bloques_punteros[nivel_punteros]==0){
-                        liberar_bloque(ptr);
-                        //printf("liberado BF %d de punteros de nivel %d correspondiente al BL %d\n",ptr,nivel_punteros,nblogico);
-                        liberados++;
-                        nivel_punteros++;
-                        if(nivel_punteros==nRangoBL){
-                            inodo.punterosIndirectos[nRangoBL-1]=0;
-                            salvar_inodo=1;
-                        }
-                    } else {
-                        bwrite(ptr,bloques_punteros[nivel_punteros]);
-                        nivel_punteros=nRangoBL;
-                    }  
-                }
+        if(ptr!=0){         //El bloque logico no está vacio ("optimización")
+            if (nRangoBL<0){
+                fprintf(stderr, "He petao");
+                return -1;
             }
+            nivel_punteros=nRangoBL;          
+            while(ptr>0 && nivel_punteros>0){
+                bread(ptr, bloques_punteros[nivel_punteros-1]);
+                indice= obtener_indice(nblog, nivel_punteros);
+                ptr_nivel[nivel_punteros-1]=ptr;
+                indices[nivel_punteros-1]=indice;
+                ptr=bloques_punteros[nivel_punteros-1][indice];                   
+                nivel_punteros--;
+            }
+            if (ptr>0){
+                liberar_bloque(ptr);
+                liberados++;
+                //printf("Liberado BF %d de datos correspondiente al BL %d\n",ptr,nblogico);
+                if(nRangoBL == 0) {
+                    inodo.punterosDirectos[nblog]=0;
+                    salvar_inodo=1;
+                } else {
+                    while (nivel_punteros<nRangoBL){
+                        indice=indices[nivel_punteros];
+                        bloques_punteros[nivel_punteros][indice]=0;
+                        ptr=ptr_nivel[nivel_punteros]; 
+                        if (bloques_punteros[nivel_punteros]==0){
+                            liberar_bloque(ptr);
+                            //printf("liberado BF %d de punteros de nivel %d correspondiente al BL %d\n",ptr,nivel_punteros,nblogico);
+                            liberados++;
+                            nivel_punteros++;
+                            if(nivel_punteros==nRangoBL){
+                                inodo.punterosIndirectos[nRangoBL-1]=0;
+                                salvar_inodo=1;
+                            }
+                        } else {
+                            bwrite(ptr,bloques_punteros[nivel_punteros]);
+                            nivel_punteros=nRangoBL;
+                        }  
+                    }
+                }
+           }
         }
     }
-    printf("numero de bloques liberados: %d\n", liberados);
+    fprintf(stdout, "Numero de bloques liberados: %d\n", liberados);
     if (salvar_inodo==1){
         escribir_inodo(ninodo,inodo);
     }
