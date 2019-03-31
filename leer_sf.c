@@ -69,7 +69,7 @@ int main(int argc, char **argv){
     traducir_bloque_inodo(nInodo,8,1);
     traducir_bloque_inodo(nInodo,204,1);
     traducir_bloque_inodo(nInodo,30004,1);
-    traducir_bloque_inodo(nInodo,4000004,1);
+    traducir_bloque_inodo(nInodo,400004,1);
     traducir_bloque_inodo(nInodo,16843019,1);
 
     struct tm *ts;
