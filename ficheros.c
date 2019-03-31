@@ -4,7 +4,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
     int bytes_escritos = 0;
     struct inodo inodo;
     leer_inodo(ninodo,&inodo);
-    if (inodo.permisos&2==2){
+    if (inodo.permisos&&2==2){
         unsigned int BLinicio = offset/BLOCKSIZE;//Primer BL donde vamos a escribir
         unsigned int BLfinal = (offset+nbytes-1)/BLOCKSIZE;//Ultimo bloque en que vamos a escribir
         //para la escritura del primer bloque
@@ -14,7 +14,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         //caso en que hay que leer el primer bloque
             BFinicio= traducir_bloque_inodo(ninodo,BLinicio,0);
             bread(BFinicio,buf_bloque);
-            memcpy(buf_bloque+desp1,buf_original,BLOCKSIZE-desp1);
+            memcpy(&buf_bloque+desp1,buf_original,BLOCKSIZE-desp1);
             bwrite(BFinicio,buf_bloque);
             bytes_escritos = BLOCKSIZE-desp1;
         int BF;
@@ -28,7 +28,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         BF= traducir_bloque_inodo(ninodo,BLfinal,0);
         bread(BF,buf_bloque);
         int desp2= (BLinicio+nbytes-1)%BLOCKSIZE;//¬¬ suspicius
-        memcpy (buf_bloque, buf_original + (nbytes - desp2 - 1), desp2 + 1);
+        memcpy (buf_bloque,buf_original + (nbytes - desp2 - 1), desp2 + 1);
         bwrite(BF,buf_bloque);
         bytes_escritos += desp2+1;
         if (offset+nbytes>inodo.tamEnBytesLog){
@@ -45,7 +45,7 @@ int mi_read_f(unsigned int ninodo,const void *buf_original, unsigned int offset,
     int leidos = 0;
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
-    if (inodo.permisos&4==4){   //Comprobar que tenemos permisos para leer
+    if (inodo.permisos&&4==4){   //Comprobar que tenemos permisos para leer
         if (offset>= inodo.tamEnBytesLog){  //El offset se sale del tamaño del inodo
             return leidos;
         }
@@ -63,7 +63,7 @@ int mi_read_f(unsigned int ninodo,const void *buf_original, unsigned int offset,
         BFinicio= traducir_bloque_inodo(ninodo,BLinicio,0);
         if (BFinicio != -1){
             bread(BFinicio,buf_bloque);
-            memcpy(buf_original,buf_bloque+desp1,BLOCKSIZE-desp1);
+            memcpy(&buf_original,buf_bloque+desp1,BLOCKSIZE-desp1);
         }
         leidos+=BLOCKSIZE-desp1;
         
@@ -73,7 +73,7 @@ int mi_read_f(unsigned int ninodo,const void *buf_original, unsigned int offset,
             BF= traducir_bloque_inodo(ninodo,i,0);
             if (BF != -1){
                 bread(BF, buf_bloque);
-                memcopy(buf_original+leidos, buf_bloque, BLOCKSIZE);
+                memcpy(&buf_original+leidos, buf_bloque, BLOCKSIZE);
             }
         leidos += BLOCKSIZE; 
         }
@@ -82,7 +82,7 @@ int mi_read_f(unsigned int ninodo,const void *buf_original, unsigned int offset,
         BF= traducir_bloque_inodo(ninodo,BLfinal,0);
         if (BF != -1){
             bread(BF,buf_bloque);          
-            memcpy (buf_original, buf_bloque + (nbytes - desp2 - 1), desp2 + 1);
+            memcpy (&buf_original, buf_bloque + (nbytes - desp2 - 1), desp2 + 1);
         }
         leidos += desp2+1;
 
@@ -118,7 +118,7 @@ int mi_truncar_f(unsigned int ninodo,unsigned int nbytes){
     unsigned int nblogico;
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
-    if (inodo.permisos&2==2){
+    if (inodo.permisos&&2==2){
         if (nbytes >= inodo.tamEnBytesLog){ //No se puede truncar un archivo a un tamaño superior
             fprintf(stderr, "ERROR: el tamaño a truncar es demasiado grande.");
         } else{
@@ -131,6 +131,7 @@ int mi_truncar_f(unsigned int ninodo,unsigned int nbytes){
             inodo.mtime = time(NULL);
             inodo.ctime = time(NULL);
             inodo.tamEnBytesLog = nbytes;
+            inodo.numBloquesOcupados = inodo.numBloquesOcupados-liberados;
             escribir_inodo(ninodo,inodo);
         }   
     }

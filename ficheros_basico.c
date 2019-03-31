@@ -163,7 +163,7 @@ int escribir_inodo(unsigned int ninodo, struct inodo inodo){
     int pos = ninodo % (BLOCKSIZE/INODOSIZE);
     ino2[pos]= inodo;
     bwrite(posBloqueInodo,ino2); 
-
+    
     return 0;
 }
 
@@ -353,15 +353,15 @@ int liberar_bloques_inodo(unsigned int ninodo, unsigned int nblogico){
     int liberados=0;
     int salvar_inodo =0;
     leer_inodo(ninodo,&inodo);
-    //  if (inodo.tamEnBytesLog==0){
-    //      return 0;
-    // }
-    // if (inodo.tamEnBytesLog % BLOCKSIZE == 0){
-    //     ultimoBL = inodo.tamEnBytesLog/BLOCKSIZE -1;
-    // } else {
-    //     ultimoBL = inodo.tamEnBytesLog/BLOCKSIZE;
-    // }
-    ultimoBL=INDIRECTOS2-1;
+    if (inodo.tamEnBytesLog==0){
+         return 0;
+    }
+    if (inodo.tamEnBytesLog % BLOCKSIZE == 0){
+        ultimoBL = inodo.tamEnBytesLog/BLOCKSIZE -1;
+    } else {
+         ultimoBL = inodo.tamEnBytesLog/BLOCKSIZE;
+    }
+    //ultimoBL=INDIRECTOS2-1;
     //printf("Primer bloque logico: 0, último BL: %d\n",ultimoBL);
     ptr = 0;
     for(nblog=nblogico; nblog <= ultimoBL; nblog++){//maybe 

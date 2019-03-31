@@ -20,7 +20,7 @@ int main(int argc, char **argv){
     printf("Tamaño struct superbloque: %lu\n", sizeof(struct superbloque));
     printf("Tamaño struct inodo: %lu\n", sizeof(struct inodo));
 
-    reservar_bloque();
+    /*reservar_bloque();
 
     printf("Cantidad bloques libres: %d \n", SB.cantBloquesLibres);
 
@@ -97,7 +97,7 @@ int main(int argc, char **argv){
     leer_inodo(nInodo, &inod);
     printf("Numero de bloques ocupados: %d\n", inod.numBloquesOcupados);
     printf("Posición del primer inodo libre: %d\n", SB.posPrimerInodoLibre);
-    liberar_inodo(nInodo);
+    liberar_inodo(nInodo); */
     
     bumount();
     return 0;
