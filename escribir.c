@@ -8,7 +8,7 @@ int main(int argc, char **argv){
         //printf("Posición cantInodosLibres: %d\n", SB.cantInodosLibres);
         int ninodo= reservar_inodo('f',6);
         printf("Numero inodo: %d\n", ninodo);
-        int offset = 256000;
+        int offset = 0;
         char *texto= argv[2];
         char buffer[strlen(texto)];
         printf("Strlen()texto = %ld\n", strlen(texto));
@@ -21,8 +21,8 @@ int main(int argc, char **argv){
         fprintf(stderr,"Tamaño en bytes logicos : %d\n",stat ->tamEnBytesLog);
         //fprintf(stderr,"Número de bloques ocupados: %d\n", stat ->numBloquesOcupados);
         mi_read_f(ninodo,buffer,offset,strlen(texto));
-        int fd = open("texto.txt", O_RDWR | O_CREAT, S_IRUSR | S_IROTH);
-        write(fd,buffer,bloques_escritos*BLOCKSIZE);
+        //int fd = open("texto.txt", O_RDWR | O_CREAT, S_IRUSR | S_IROTH);
+        //write(fd,buffer,bloques_escritos*BLOCKSIZE);
         bumount();
     } else {
         printf("Sintaxis: escribir <nombre_dispositivo> <$(cat fichero)> <diferentes_inodos>");

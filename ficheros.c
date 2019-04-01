@@ -16,20 +16,26 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
             bread(BFinicio,buf_bloque);
             memcpy(&buf_bloque+desp1,buf_original,BLOCKSIZE-desp1);
             bwrite(BFinicio,buf_bloque);
+            //printf("buf_bloque1= %s",buf_bloque);
             bytes_escritos = BLOCKSIZE-desp1;
         int BF;
         //bloques intermedios se escriben enteros
         for(int i =BLinicio+1;i < BLfinal;i++){
-           BF= traducir_bloque_inodo(ninodo,i,0);
-           bwrite (BF, buf_original + (BLOCKSIZE - desp1) + (i - BLinicio - 1) * BLOCKSIZE);
-           bytes_escritos += BLOCKSIZE; 
+            BF= traducir_bloque_inodo(ninodo,i,0); 
+            bread(BFinicio,buf_bloque);
+            memcpy(&buf_bloque,buf_original + (BLOCKSIZE - desp1) + (i - BLinicio - 1) * BLOCKSIZE,BLOCKSIZE);          
+            bwrite (BF,buf_bloque);
+            //printf("\nbuf_cosas= %s\n",buf_bloque);
+            bytes_escritos += BLOCKSIZE; 
         }
         //se escribe el ultimo bloque
         BF= traducir_bloque_inodo(ninodo,BLfinal,0);
         bread(BF,buf_bloque);
-        int desp2= (BLinicio+nbytes-1)%BLOCKSIZE;//¬¬ suspicius
+        int desp2= (offset+nbytes-1)%BLOCKSIZE;//¬¬ suspicius
+        memset(buf_bloque,0,BLOCKSIZE);
         memcpy (buf_bloque,buf_original + (nbytes - desp2 - 1), desp2 + 1);
         bwrite(BF,buf_bloque);
+        printf("buf_bloque2= %s",buf_bloque);
         bytes_escritos += desp2+1;
         if (offset+nbytes>inodo.tamEnBytesLog){
             inodo.tamEnBytesLog = offset+nbytes;
