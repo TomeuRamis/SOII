@@ -12,7 +12,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         unsigned char buf_bloque[BLOCKSIZE];
         int BFinicio;
         //caso en que hay que leer el primer bloque
-            BFinicio= traducir_bloque_inodo(ninodo,BLinicio,0);
+            BFinicio= traducir_bloque_inodo(ninodo,BLinicio,1);
             bread(BFinicio,buf_bloque);
             memcpy(&buf_bloque+desp1,buf_original,BLOCKSIZE-desp1);
             bwrite(BFinicio,buf_bloque);
@@ -20,14 +20,14 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         int BF;
         //bloques intermedios se escriben enteros
         for(int i =BLinicio+1;i < BLfinal;i++){
-            BF= traducir_bloque_inodo(ninodo,i,0); 
+            BF= traducir_bloque_inodo(ninodo,i,1); 
             bread(BFinicio,buf_bloque);
             memcpy(&buf_bloque,buf_original + (BLOCKSIZE - desp1) + (i - BLinicio - 1) * BLOCKSIZE,BLOCKSIZE);          
             bwrite (BF,buf_bloque);
             bytes_escritos += BLOCKSIZE; 
         }
         //se escribe el ultimo bloque
-        BF= traducir_bloque_inodo(ninodo,BLfinal,0);
+        BF= traducir_bloque_inodo(ninodo,BLfinal,1);
         bread(BF,buf_bloque);
         int desp2= (offset+nbytes-1)%BLOCKSIZE;//¬¬ suspicius
         memset(buf_bloque,0,BLOCKSIZE);
@@ -58,14 +58,16 @@ int mi_read_f(unsigned int ninodo,const void *buf_original, unsigned int offset,
         }
         
         unsigned int BLinicio = offset/BLOCKSIZE;//Primer BL donde vamos a leer
-        printf("\nBLinicio = %d",BLinicio);
+        printf("BLinicio  %d\n", BLinicio);
         unsigned int BLfinal = (offset+nbytes-1)/BLOCKSIZE;//Ultimo bloque que vamos a leer
         int desp1 = offset%BLOCKSIZE;
+        printf("desp1  %d\n", desp1);
         
         unsigned char buf_bloque[BLOCKSIZE];
         int BFinicio;
         //caso en que hay que leer el primer bloque
-        BFinicio= traducir_bloque_inodo(ninodo,BLinicio,0);
+        BFinicio= traducir_bloque_inodo(ninodo,offset,0);
+        printf("BFinicio: %d\n", BFinicio);
         if (BFinicio != -1){
             bread(BFinicio,buf_bloque);
             memcpy(&buf_original,buf_bloque+desp1,BLOCKSIZE-desp1);

@@ -213,10 +213,12 @@ int reservar_inodo(char tipo, unsigned char permisos){
 
 int obtener_nrangoBL(struct inodo inodo, unsigned int nblogico, unsigned int *ptr){
     int nrangoBL=-1;
+    printf("nblogico en obtener nrangoBL: %d\n", nblogico);
     if(nblogico<DIRECTOS){ /////////////////////// peligro asterisco
         *ptr=inodo.punterosDirectos[nblogico];
+        printf("Valor ptr: %d\n", *ptr);
         nrangoBL = 0;
-        //printf("Inodo.PunterosDirectos[%d]\n", nblogico);
+        printf("Inodo.PunterosDirectos[%d]\n", nblogico);
     }else if(nblogico<INDIRECTOS0){
         *ptr=inodo.punterosIndirectos[0];
         nrangoBL = 1;    
@@ -269,13 +271,14 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
     ptr=0;
     ptr_ant=0;
     salvar_inodo=0;
+    printf("NBlogico en traducir_bloque_inodo %d\n", nblogico);
     nRangoBL=obtener_nrangoBL(inodo, nblogico, &ptr);
     nivel_punteros=nRangoBL;
     while(nivel_punteros>0){                    //iterar para cada nivel de indirectos
         //printf("Nivel de punteros: %d -> ",nivel_punteros);
         if(ptr==0){                             //no cuelgan bloques de puntero
             if(reservar==0){
-                //printf("Error de lectura del bloque inexistente");
+                printf("Error de lectura del bloque inexistente");
                 return -1;
             }else{                               //reservar bloques punteros y crear enlaces desde inodo hasta datos
                 salvar_inodo=1;
@@ -302,8 +305,8 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
     //printf("valor de ptr: %d\n", ptr);
     if(ptr==0){                                 //no existe bloque de datos
         if(reservar==0){                        //error lectura ∄ bloque  
-            //printf("Error de lectura del bloque.");
-            return -1;
+            printf("Error de lectura del bloque.");
+            return -2;
         }else{
             salvar_inodo=1;
             ptr=reservar_bloque();              //de datos
