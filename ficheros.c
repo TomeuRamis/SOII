@@ -77,9 +77,10 @@ int mi_read_f(unsigned int ninodo,const void *buf_original, unsigned int offset,
         //bloques intermedios se leen enteros
         for(int i =BLinicio+1;i < BLfinal;i++){
             BF= traducir_bloque_inodo(ninodo,i,0);
+            printf("Valor BF en bucle mi_read_f: %d\n",BF);
             if (BF != -1){
                 bread(BF, buf_bloque);
-            printf("\nbuf_bloque = %s\n",buf_bloque);
+                printf("\nbuf_bloque = %s\n",buf_bloque);
                 memcpy(&buf_original+leidos, buf_bloque, BLOCKSIZE);
             }
         leidos += BLOCKSIZE; 
