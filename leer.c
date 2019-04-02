@@ -10,7 +10,7 @@ int main(int argc, char **argv){
     int ninodo = strtol(argv[2],NULL,0);
     printf("ninodo %d\n",ninodo);
     char *buffer_texto= malloc(TAMLEC);
-    leer_inodo(ninodo,&inodo);
+    //leer_inodo(ninodo,&inodo);
     int offset = 0;
     printf("inodo.tamBytesLog = %d\n",inodo.tamEnBytesLog);
     while(offset<inodo.tamEnBytesLog){
@@ -19,7 +19,8 @@ int main(int argc, char **argv){
         write(1,buffer_texto,TAMLEC);
         offset += TAMLEC;
     }
-    bumount();
     printf("bytes leidos = %d\n",leidos);
+    bumount();
+    
     return 0;
 }

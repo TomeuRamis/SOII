@@ -15,7 +15,8 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
             BFinicio= traducir_bloque_inodo(ninodo,BLinicio,1);
             bread(BFinicio,buf_bloque);
             memcpy(&buf_bloque+desp1,buf_original,BLOCKSIZE-desp1);
-            bwrite(BFinicio,buf_bloque);
+            printf("BUf_bloque: %s",buf_bloque);
+            bwrite(BFinicio,&buf_bloque);
             bytes_escritos = BLOCKSIZE-desp1;
         int BF;
         //bloques intermedios se escriben enteros
@@ -23,7 +24,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
             BF= traducir_bloque_inodo(ninodo,i,1); 
             bread(BFinicio,buf_bloque);
             memcpy(&buf_bloque,buf_original + (BLOCKSIZE - desp1) + (i - BLinicio - 1) * BLOCKSIZE,BLOCKSIZE);          
-            bwrite (BF,buf_bloque);
+            bwrite (BF,&buf_bloque);
             bytes_escritos += BLOCKSIZE; 
         }
         //se escribe el ultimo bloque
@@ -32,7 +33,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         int desp2= (offset+nbytes-1)%BLOCKSIZE;//¬¬ suspicius
         memset(buf_bloque,0,BLOCKSIZE);
         memcpy (buf_bloque,buf_original + (nbytes - desp2 - 1), desp2 + 1);
-        bwrite(BF,buf_bloque);
+        bwrite(BF,&buf_bloque);
         bytes_escritos += desp2+1;
         if (offset+nbytes>inodo.tamEnBytesLog){
             inodo.tamEnBytesLog = offset+nbytes;
