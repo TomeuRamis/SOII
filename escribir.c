@@ -8,7 +8,7 @@ int main(int argc, char **argv){
         bread(0, &SB);
         //printf("Posición cantInodosLibres: %d\n", SB.cantInodosLibres);
         int ninodo= reservar_inodo('f',6);
-        leer_inodo(ninodo,&inodo);
+        //leer_inodo(ninodo,&inodo);
         printf("Numero inodo: %d\n", ninodo);
         int offset = 0;
         char *texto= argv[2];
@@ -30,11 +30,12 @@ int main(int argc, char **argv){
         memset(buffer,0,strlen(texto));
         mi_read_f(ninodo,buffer,offset,strlen(texto));
         write(1,buffer,strlen(texto));
+        printf("\n");
         //printf("contenido escrito: %s\n", &buffer );
         //int fd = open("texto.txt", O_RDWR | O_CREAT, S_IRUSR | S_IROTH);
         //write(fd,buffer,bloques_escritos*BLOCKSIZE);
-        // escribir_inodo(ninodo,inodo);
-        printf("Contenido punteros directos : %d\n",inodo.punterosDirectos[0]);
+        //escribir_inodo(ninodo,inodo);
+        //printf("Contenido punteros directos : %d\n",inodo.punterosDirectos[0]);
         /* printf("\n\n----------------------------------------------------------\n");
         int TAMLEC=BLOCKSIZE;
         int leidos=0;

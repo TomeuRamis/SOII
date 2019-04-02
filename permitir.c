@@ -8,10 +8,11 @@ int main(int argc, char **argv){
         unsigned int ninodo = strtol(argv[2],NULL,0);
         unsigned int permisos = strtol(argv[3],NULL,0);
         leer_inodo(ninodo,&inodo);
-        printf("Introducido permisos= %d",permisos);
-        printf("Permisos = %d\n",inodo.permisos);
+        printf("Permisos introducidos = %d\n",permisos);
+        printf("Permisos aniguos = %d\n",inodo.permisos);
         mi_chmod_f(ninodo,permisos);
-        printf("Permisos = %d\n",inodo.permisos);
+        leer_inodo(ninodo,&inodo);
+        printf("Permisos nuevos = %d\n",inodo.permisos);
         bumount();
     } else {
         printf("Sintaxis: truncar <nombre_dispositivo> <ninodo> <nbytes>");

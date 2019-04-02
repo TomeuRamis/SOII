@@ -213,12 +213,12 @@ int reservar_inodo(char tipo, unsigned char permisos){
 
 int obtener_nrangoBL(struct inodo inodo, unsigned int nblogico, unsigned int *ptr){
     int nrangoBL=-1;
-    printf("nblogico en obtener nrangoBL: %d\n", nblogico);
+    //printf("nblogico en obtener nrangoBL: %d\n", nblogico);
     if(nblogico<DIRECTOS){ /////////////////////// peligro asterisco
         *ptr=inodo.punterosDirectos[nblogico];
         //printf("Valor ptr: %d\n",ptr);
         nrangoBL = 0;
-        printf("Inodo.PunterosDirectos[%d] = %d\n", nblogico,inodo.punterosDirectos[nblogico]);
+        //printf("Inodo.PunterosDirectos[%d] = %d\n", nblogico,inodo.punterosDirectos[nblogico]);
     }else if(nblogico<INDIRECTOS0){
         *ptr=inodo.punterosIndirectos[0];
         nrangoBL = 1;    
@@ -271,10 +271,10 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
     ptr=0;
     ptr_ant=0;
     salvar_inodo=0;
-    printf("NBlogico en traducir_bloque_inodo %d\n", nblogico);
+    //printf("NBlogico en traducir_bloque_inodo %d\n", nblogico);
     nRangoBL=obtener_nrangoBL(inodo, nblogico, &ptr);
     nivel_punteros=nRangoBL;
-    printf("Valor ptr: %d\n",ptr);
+    //printf("Valor ptr: %d\n",ptr);
     while(nivel_punteros>0){                    //iterar para cada nivel de indirectos
         //printf("Nivel de punteros: %d -> ",nivel_punteros);
         if(ptr==0){                             //no cuelgan bloques de puntero
@@ -311,13 +311,13 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
         }else{
             salvar_inodo=1;
             ptr=reservar_bloque();              //de datos   
-            printf("\nValor ptr after reserva: %d",ptr);        
+            //printf("\nValor ptr after reserva: %d",ptr);        
             inodo.numBloquesOcupados++;
             inodo.ctime=time(NULL);
             if(nRangoBL==0){
-                printf("\n1r inodo.PunterosDirectos[%d] = %d",nblogico,inodo.punterosDirectos[nblogico]);
+                //printf("\n1r inodo.PunterosDirectos[%d] = %d",nblogico,inodo.punterosDirectos[nblogico]);
                 inodo.punterosDirectos[nblogico]=ptr;
-                printf("\n2n inodo.PunterosDirectos[%d] = %d",nblogico,inodo.punterosDirectos[nblogico]);
+                //printf("\n2n inodo.PunterosDirectos[%d] = %d",nblogico,inodo.punterosDirectos[nblogico]);
             }else{
                 buffer[indice]=ptr;
                 bwrite(ptr_ant,buffer);
