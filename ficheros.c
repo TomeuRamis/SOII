@@ -14,37 +14,44 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         //printf("desp1: %d\n", desp1);
         unsigned char buf_bloque[BLOCKSIZE];
         int BF;
+        
         //caso en que hay que leer el primer bloque
+        memset(buf_bloque,0,BLOCKSIZE);
         BF= traducir_bloque_inodo(ninodo,BLinicio,1);
-        if(BF!=-1){
+        if (nbytes <=BLOCKSIZE-desp1 && BF!=-1){           
+            memcpy(buf_bloque+desp1,buf_original,nbytes); //He quitado ampersan
+            //printf("BUf_bloque: %s",buf_bloque+desp1);
+            bwrite(BF,buf_bloque);        
+        } else{
             bread(BF,buf_bloque);
             memcpy(buf_bloque+desp1,buf_original,BLOCKSIZE-desp1); //He quitado ampersan
             //printf("BUf_bloque: %s",buf_bloque+desp1);
             bwrite(BF,buf_bloque);
             //printf("BUf_bloque: %s",buf_bloque);
-            //bytes_escritos = BLOCKSIZE-desp1;
-        }
-        //bloques intermedios se escriben enteros
-        for(int i =BLinicio+1;i < BLfinal;i++){
-            BF= traducir_bloque_inodo(ninodo,i,1); 
-            if (BF!= -1){
-                bread(BF,buf_bloque);       //Habia BFinicio
-                memcpy(buf_bloque,buf_original + (BLOCKSIZE - desp1) + (i - BLinicio - 1) * BLOCKSIZE,BLOCKSIZE);          
-                bwrite (BF,buf_bloque);
-                //printf("BUf_bloque: %s",buf_bloque);
-                //bytes_escritos += BLOCKSIZE; 
+            //bytes_escritos = BLOCKSIZE-desp1;        
+            //bloques intermedios se escriben enteros
+            for(int i =BLinicio+1;i < BLfinal;i++){
+                memset(buf_bloque,0,BLOCKSIZE);
+                BF= traducir_bloque_inodo(ninodo,i,1); 
+                if (BF!= -1){
+                    //bread(BF,buf_bloque);       //Habia BFinicio
+                    memcpy(buf_bloque,buf_original + (BLOCKSIZE - desp1) + (i - BLinicio - 1) * BLOCKSIZE,BLOCKSIZE);          
+                    bwrite (BF,buf_bloque);
+                    //printf("BUf_bloque: %s",buf_bloque);
+                    //bytes_escritos += BLOCKSIZE; 
+                }
             }
-        }
-        //se escribe el ultimo bloque
-        BF= traducir_bloque_inodo(ninodo,BLfinal,1);
-        if (BF!=-1 && BLinicio!=BLfinal){  //Si se puede reservar el bloque y es diferente al inicial
-            bread(BF,buf_bloque);
-            int desp2= (offset+nbytes-1)%BLOCKSIZE;//¬¬ suspicius
-            memset(buf_bloque,0,BLOCKSIZE);
-            memcpy (buf_bloque,buf_original + (nbytes - desp2 - 1), desp2 + 1);
-            bwrite(BF,buf_bloque);
-            //printf("BUf_bloque: %s",buf_bloque);
-            //bytes_escritos += desp2+1;
+            //se escribe el ultimo bloque
+            BF= traducir_bloque_inodo(ninodo,BLfinal,1);
+            if (BF!=-1 && BLinicio!=BLfinal){  //Si se puede reservar el bloque y es diferente al inicial
+                bread(BF,buf_bloque);
+                int desp2= (offset+nbytes-1)%BLOCKSIZE;//¬¬ suspicius
+                memset(buf_bloque,0,BLOCKSIZE);
+                memcpy (buf_bloque,buf_original + (nbytes - desp2 - 1), desp2 + 1);
+                bwrite(BF,buf_bloque);
+                //printf("BUf_bloque: %s",buf_bloque);
+                //bytes_escritos += desp2+1;
+            }
         }
         leer_inodo(ninodo,&inodo);
         if (offset+nbytes>inodo.tamEnBytesLog){
@@ -77,10 +84,17 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         //printf("desp1  %d\n", desp1);
         
         unsigned char buf_bloque[BLOCKSIZE];
+        memset(buf_bloque, 0, BLOCKSIZE);
+        memset(buf_original, 0, BLOCKSIZE);
         int BF;
         //caso en que hay que leer el primer bloque
         BF= traducir_bloque_inodo(ninodo,BLinicio,0);
         //printf("BFinicio: %d\n", BF);
+/*         if (nbytes <=BLOCKSIZE-desp1 && BF!=-1){
+            bread(BF,buf_bloque);
+            memcpy(buf_original,buf_bloque+desp1,nbytes); //He quitado ampersan
+            return nbytes;
+        } */
         if (BF!= -1){
             bread(BF,buf_bloque);
             //printf("Primer bloque leido: %s\n\n", buf_bloque+desp1);   

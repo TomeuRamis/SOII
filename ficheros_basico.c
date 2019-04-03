@@ -222,14 +222,14 @@ int obtener_nrangoBL(struct inodo inodo, unsigned int nblogico, unsigned int *pt
     }else if(nblogico<INDIRECTOS0){
         *ptr=inodo.punterosIndirectos[0];
         nrangoBL = 1;    
-        //printf("Inodo.PunterosIndirectos[0]\n");
+        printf("Inodo.PunterosIndirectos[0]=%d\n", *ptr);
     }else if(nblogico<INDIRECTOS1){
         *ptr=inodo.punterosIndirectos[1];
         nrangoBL = 2;
-        //printf("Inodo.PunterosIndirectos[1]\n");
+        printf("Inodo.PunterosIndirectos[1]=%d\n", *ptr);
     }else if(nblogico<INDIRECTOS2){
         *ptr=inodo.punterosIndirectos[2];
-        //printf("Inodo.PunterosIndirectos[2]\n");
+        printf("Inodo.PunterosIndirectos[2]=%d\n", *ptr);
         nrangoBL = 3;
     }else{
         *ptr=0;
