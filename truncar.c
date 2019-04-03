@@ -8,11 +8,12 @@ int main(int argc, char **argv){
         int ninodo = strtol(argv[2],NULL,0);
         int nbytes = strtol(argv[3],NULL,0);
         leer_inodo(ninodo,&inodo);
-        printf("TamenByteslog = %d i BloquesOcupados = %d",inodo.tamEnBytesLog,inodo.numBloquesOcupados);
+        printf("TamenByteslog = %d i BloquesOcupados = %d\n",inodo.tamEnBytesLog,inodo.numBloquesOcupados);
         mi_truncar_f(ninodo,nbytes);
-        bumount();
-        printf("TamenByteslog = %d i BloquesOcupados = %d",inodo.tamEnBytesLog,inodo.numBloquesOcupados);
+        leer_inodo(ninodo,&inodo);
+        printf("TamenByteslog = %d i BloquesOcupados = %d\n",inodo.tamEnBytesLog,inodo.numBloquesOcupados);
         printf("Truncar.c ha finalizado\n");
+        bumount();
     } else {
         printf("Sintaxis: truncar <nombre_dispositivo> <ninodo> <nbytes>");
     }

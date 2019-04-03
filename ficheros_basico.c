@@ -274,7 +274,7 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
     //printf("NBlogico en traducir_bloque_inodo %d\n", nblogico);
     nRangoBL=obtener_nrangoBL(inodo, nblogico, &ptr);
     nivel_punteros=nRangoBL;
-    //printf("Valor ptr: %d\n",ptr);
+    
     while(nivel_punteros>0){                    //iterar para cada nivel de indirectos
         //printf("Nivel de punteros: %d -> ",nivel_punteros);
         if(ptr==0){                             //no cuelgan bloques de puntero
@@ -293,6 +293,7 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
                     buffer[indice]=ptr;
                     bwrite(ptr_ant,buffer);
                 }
+                //printf("Valor ptr en traducir bloque inodo: %d\n",ptr);
             }
         }
         //printf("Punteros nivel%d [%d] = %d (BF %d para punteros_nivel %d)\n", nivel_punteros, indice, ptr, ptr, nivel_punteros);
@@ -310,8 +311,9 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
             return -1;
         }else{
             salvar_inodo=1;
+     
             ptr=reservar_bloque();              //de datos   
-            //printf("\nValor ptr after reserva: %d",ptr);        
+            
             inodo.numBloquesOcupados++;
             inodo.ctime=time(NULL);
             if(nRangoBL==0){

@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "bloques.h": "c"
+        "bloques.h": "c",
+        "ficheros.h": "c"
     }
 }
