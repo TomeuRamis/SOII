@@ -268,7 +268,7 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
     while(nivel_punteros>0){                    //iterar para cada nivel de indirectos
         if(ptr==0){                             //no cuelgan bloques de puntero
             if(reservar==0){
-                //printf("Error de lectura del bloque inexistente");
+                //fprintf(stderr, "Error de lectura del bloque inexistente");
                 return -1;
             }else{                               //reservar bloques punteros y crear enlaces desde inodo hasta datos
                 salvar_inodo=1;
@@ -292,7 +292,7 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
     }                                           //al salir de este bucle ya estamos al nivel de datos
     if(ptr==0){                                 //no existe bloque de datos
         if(reservar==0){                        //error lectura ∄ bloque  
-            //printf("Error de lectura del bloque.");
+            //fprintf(stderr, "Error de lectura del bloque.");
             return -1;
         }else{
             salvar_inodo=1;     
