@@ -1,4 +1,4 @@
-#include "ficheros_basico.h" //el más avanzado .h
+#include "directorios.h" //el más avanzado .h
 
 int main(int argc, char **argv){
     
