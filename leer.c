@@ -1,6 +1,6 @@
 #include "ficheros.h"
 
-int TAMLEC = 1500; 
+int TAMLEC = 1024; 
 
 int main(int argc, char **argv){
     int fd = 0;
@@ -12,7 +12,7 @@ int main(int argc, char **argv){
             fd = 1;
         }
         int leidos = 0;
-        int offset = 0;
+        unsigned int offset = 0;
         struct inodo inodo;
         int ninodo = strtol(argv[2],NULL,0);
         unsigned char buffer_texto[TAMLEC];
@@ -21,7 +21,8 @@ int main(int argc, char **argv){
         bread(0, &SB);    
         memset(buffer_texto,0,TAMLEC);          //Inicializamos el buffer con 0s
         int leido_aux = mi_read_f(ninodo, buffer_texto, offset, TAMLEC); //Guardamos los bytes leeidos en lido_aux
-        while(leido_aux>0){ 
+        leer_inodo(ninodo, &inodo);
+        while(offset < inodo.tamEnBytesLog){ 
             write(fd, buffer_texto, leido_aux);    //Escribimos por pantalla o en el fichero lo que acabamos de leer
             leidos += leido_aux;                //Actualizamos los bytes leidos totales
             offset += leido_aux;  

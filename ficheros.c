@@ -84,11 +84,12 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         if(BF == -1){   //Si el bloque no existe, devolvemos los bytes que deberiamos haber leido
             return nbytes;
         } else {
-            if (nbytes <=BLOCKSIZE-desp1 && BF!=-1){           
+            if (nbytes <=BLOCKSIZE-desp1){           
                 bread(BF,buf_bloque);
                 memcpy(buf_original,buf_bloque+desp1,nbytes); 
                 leidos += nbytes;  
                 printf("eSTOY EN LA PRIMERA%d\n", leidos);
+                return leidos;
             } else { 
                 printf("Estoy en la segunda%d\n", leidos);
                 bread(BF,buf_bloque);
@@ -100,8 +101,9 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
                     if (BF != -1){
                         bread(BF, buf_bloque);
                         memcpy(buf_original+leidos, buf_bloque, BLOCKSIZE);
-                        leidos += BLOCKSIZE;
-                    }    
+                        
+                    }  
+                    leidos += BLOCKSIZE;  
                 }
                 //se escribe el ultimo bloque
                 int desp2= (offset+nbytes-1)%BLOCKSIZE;
@@ -110,9 +112,9 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
                     if (BF != -1){ //Que exsista el bloque y no sea el mismo del principio
                         memset(buf_bloque,0,BLOCKSIZE);
                         bread(BF,buf_bloque); 
-                        memcpy (buf_original+leidos, buf_bloque, desp2 + 1);
-                        leidos += desp2+1;
+                        memcpy (buf_original+leidos, buf_bloque, desp2 + 1); 
                     }
+                    leidos += desp2+1;
                 }
             }
        }
