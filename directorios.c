@@ -26,6 +26,7 @@ int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir,
 unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char permisos){
     char *inicial;
     char *final;
+    int nentrada;
     struct inodo inodo;
     struct entrada entrada;
     if (camino_parcial == '/'){
@@ -42,13 +43,56 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         return -2; //Error de permisos de lectura
     }
     int num_entradas = inodo.tamEnBytesLog/sizeof(struct entrada);
+    nentrada = 0;
     if(num_entradas>0){
-        mi_read_f(entrada,) 
-        while (){
-
+        mi_read_f(p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
+             
+        while( (nentrada < num_entradas)&&(inicial != entrada.nombre)){
+            nentrada++;
+            mi_read_f(p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada));
         }
     }
-    
+    if (nentrada==num_entradas) {
+        switch (reservar) {
+            case 0: return -3; //Error no exsiste entrada consulta
+            case 1: //modo escritura
+            if (strcmp(inodo.tipo, 'f')){
+                return -4; //Error no se puede crear entrada en un fichero
+            }
+            if (inodo.permisos&&2==2){
+                return -5; //Error permisos escritura
+            } else {
+                memcpy(entrada.nombre, inicial, sizeof(entrada.nombre));
+                if (strcmp(inodo.tipo, 'd')){
+                    if (final == '/'){
+                        entrada.ninodo = reservar_inodo('d', permisos);
+                    } else {
+                        return -6; //Error no exsiste directorio intermedio
+                    }
+                } else {
+                    entrada.ninodo = reservar_inodo('f', permisos);
+                }
+                int escritos = mi_write_f(p_inodo_dir, &entrada, num_entradas*sizeof(struct entrada), sizeof(struct entrada));
+                if(escritos != sizeof(struct entrada)){
+                    if (entrada.ninodo != -1){
+                        liberar_inodo(entrada.ninodo);
+                    }
+                    return -7; //Error EXIT_FAILURE
+                }
+            }
+            break;
+        }
 
-
+    }
+    if( strcmp(final, "")){ //Puede que sea /0
+        if ((nentrada < num_entradas)&&(reservar=1)) {
+            return -8; //Error entrada ya exsistente
+        }
+        p_inodo = entrada.ninodo;
+        p_entrada = nentrada;
+        return 1; //Exit success
+    } else {
+        p_inodo_dir = entrada.ninodo;
+        return buscar_entrada(final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos);
+    }
 }
