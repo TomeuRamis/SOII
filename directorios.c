@@ -21,7 +21,7 @@ int extraer_camino(const char *camino, char *inicial, char *final){
         return 1; 
     }
 }
-
+//p_inodo no se actualiza, es posible que al empezar p_inodo = p_inod_dir y se actualiza p_inodo_dir
 int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir,
 unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char permisos){
     char *inicial;
@@ -88,11 +88,47 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         if ((nentrada < num_entradas)&&(reservar=1)) {
             return -8; //Error entrada ya exsistente
         }
-        p_inodo = entrada.ninodo;
+        p_inodo = entrada.ninodo; //REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         p_entrada = nentrada;
         return 1; //Exit success
     } else {
-        p_inodo_dir = entrada.ninodo;
+        p_inodo_dir = entrada.ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         return buscar_entrada(final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos);
+    }
+}
+
+int mi_creat(const char *camino, unsigned char permisos){
+    unsigned int p_entrada =0;
+    int error = buscar_entrada(camino,0,0,p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
+    switch (error){
+        case -2:
+            printf("Error con los permisos de lectura");
+        break;
+        case -5:
+            printf("Error permisos de escritura");
+        break;
+        case -8:
+            printf("Entrada ya existente");
+        break;
+    }
+    return error;
+}
+
+int mi_dir(const char *camino, char *buffer){
+    unsigned int *p_inodo = 0;
+    unsigned int *p_entrada =0;
+    struct inodo inodo;
+    int nentradas;
+    int offset = 0;
+    int error = buscar_entrada(camino,0,p_inodo,p_entrada,1,4);
+    if (error == -8) {
+        leer_inodo(p_inodo,&inodo);
+        if (inodo.tipo=='d' && inodo.permisos&&4==4){
+            nentradas = (inodo.tamEnBytesLog/sizeof(struct entrada))+1;
+        }
+        for(int i = 0; i < nentradas, i++){
+            offset+= mi_read_f(p_inodo,buffer,offset,sizeof(struct entrada));
+            buffer+='|';
+        }
     }
 }
