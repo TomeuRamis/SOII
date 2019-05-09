@@ -17,8 +17,9 @@ int extraer_camino(const char *camino, char *inicial, char *final){
         cont++;
     }
     printf("Llego a: extraer camino busco entrada (%d)\n",cont);
-    strncpy(inicial,prinpal+1,cont);  
-          printf("%s\n", inicial);
+    inicial = prinpal+1;                                    // EXtremadamente cutre
+    inicial = strndup(inicial, cont);  
+    printf("%s\n", inicial);
     if (camino_aux[cont]=='\0'){
         printf("Llego a: ext_cam no se encuentra directorio\n");
         printf("Inicial: %s, Final: %s",inicial,final);
