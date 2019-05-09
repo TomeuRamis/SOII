@@ -2,7 +2,8 @@
 
 int extraer_camino(const char *camino, char *inicial, char *final){
     printf("Llego a: extraer_camino\n");
-    char *prinpal= strchr(camino,'/');
+    char *prinpal= malloc(sizeof(camino));
+    prinpal = strchr(camino,'/');
     final = "";
     inicial="";
     if (!strcmp(prinpal,"/")){
@@ -10,16 +11,17 @@ int extraer_camino(const char *camino, char *inicial, char *final){
         return -1;
     }
     printf("Llego a: ext_cam el directorio es correcto\n");
-    char *camino_aux= prinpal+1;
+    char *camino_aux= malloc(sizeof(camino)); 
+    camino_aux = prinpal+1;
     int cont = 0;
-    while ((strcmp(camino_aux,"/")!=0)&&(camino_aux[cont]!='\0')){
+    while ((strcmp(camino_aux,"/")!=0)&&(camino_aux[cont]!=NULL)){
         camino_aux++;
         cont++;
     }
     printf("Llego a: extraer camino busco entrada (%d)\n",cont);
-    strncpy(inicial,prinpal+1,cont);  
-          printf("%s\n", inicial);
-    if (camino_aux[cont]=='\0'){
+    inicial=prinpal+1;  
+    printf("%s\n", inicial);
+    if (camino_aux[cont]==NULL){
         printf("Llego a: ext_cam no se encuentra directorio\n");
         printf("Inicial: %s, Final: %s",inicial,final);
         return 0;
