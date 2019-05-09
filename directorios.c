@@ -1,44 +1,55 @@
 #include "directorios.h"
 
 int extraer_camino(const char *camino, char *inicial, char *final){
+    printf("Llego a: extraer_camino\n");
     char *prinpal= strchr(camino,'/');
     final = "";
+    inicial="";
     if (!strcmp(prinpal,"/")){
         printf("Los caminos deben empezar por /\n");
         return -1;
     }
+    printf("Llego a: ext_cam el directorio es correcto\n");
     char *camino_aux= prinpal+1;
     int cont = 0;
-    while ((!strcmp(camino_aux,"/"))||(camino_aux!=NULL)){
+    while ((strcmp(camino_aux,"/")!=0)&&(camino_aux[cont]!='\0')){
         camino_aux++;
         cont++;
     }
+    printf("Llego a: extraer camino busco entrada (%d)\n",cont);
     strncpy(inicial,prinpal+1,cont);  
-    if (camino_aux == NULL){
+          printf("%s\n", inicial);
+    if (camino_aux[cont]=='\0'){
+        printf("Llego a: ext_cam no se encuentra directorio\n");
+        printf("Inicial: %s, Final: %s",inicial,final);
         return 0;
     } else {
+        printf("Llego a: ext_cam se encontro directorio\n");
         strcpy(final,camino_aux);
+        //printf("Inicial: %s, Final: %s",inicial,final);
         return 1; 
     }
 }
 //p_inodo no se actualiza, es posible que al empezar p_inodo = p_inod_dir y se actualiza p_inodo_dir
 int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir,
 unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char permisos){
+    printf("Llego a: buscar_entrada \n");
     char *inicial = NULL;
     char *final = (char*)camino_parcial;//caution
     int nentrada;
     struct inodo inodo;
     struct entrada entrada;
-    if (strcmp(camino_parcial,"/")){
+    if (strcmp(camino_parcial,"/")==0){
+        printf("Llego a: buscar entrada directorio raiz\n");
         p_inodo=0;
         p_entrada=0;
         return 0;
     }
     int tipo = extraer_camino(camino_parcial,inicial,final);
-    printf("buscar_entrada()→ inicial: %s, final: %s, reservar: %d",inicial,final,reservar);
     if (tipo == -1){
         return -1; //Error al extraer camino (falta empezar por "/")
     }
+    printf("buscar_entrada()→ inicial: %s, final: %s, reservar: %d",inicial,final,reservar);
     leer_inodo(*p_inodo_dir,&inodo);
     if(permisos&&4!=4) {
         printf("Error de permisos de lectura");
@@ -107,6 +118,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
 }
 
 int mi_creat(const char *camino, unsigned char permisos){
+    printf("Llego a:mi creat\n");
     unsigned int *p_entrada =0;
     int error = buscar_entrada(camino,0,0,p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
     switch (error){
@@ -118,6 +130,12 @@ int mi_creat(const char *camino, unsigned char permisos){
         break;
         case -8:
             printf("Entrada ya existente");
+        break;
+        case 0:
+            printf("Llego a: mi_crt camino es directorio raiz\n");
+        break;
+        case 1:
+            printf("Llego a: mi_creat: exit success\n");
         break;
     }
     return error;
