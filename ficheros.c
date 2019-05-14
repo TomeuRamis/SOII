@@ -1,4 +1,5 @@
 #include "ficheros.h"
+#include "math.h"
 
 int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset, unsigned int nbytes){
     struct inodo inodo;
@@ -6,7 +7,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
     leer_inodo(ninodo,&inodo);
     if (inodo.permisos&&2==2){
         unsigned int BLinicio = offset/BLOCKSIZE;//Primer BL donde vamos a escribir
-        unsigned int BLfinal = (offset+nbytes-1)/BLOCKSIZE;//Ultimo bloque en que vamos a escribir
+        unsigned int BLfinal = ceil((offset+nbytes-1)/BLOCKSIZE);//Ultimo bloque en que vamos a escribir
         int desp1 = offset%BLOCKSIZE;
         unsigned char buf_bloque[BLOCKSIZE];
         int BF;
@@ -62,6 +63,12 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
     if (inodo.permisos&&4==4){              //Comprobar que tenemos permisos para leer
+       
+        unsigned char buf_bloque[BLOCKSIZE];
+        memset(buf_bloque, 0, BLOCKSIZE);
+        memset(buf_original, 0, nbytes);
+        int BF, BF2;
+
         //printf("Offset: %d\n", offset);
         if (offset>= inodo.tamEnBytesLog){  //El offset se sale del tamaño del inodo
             fprintf(stderr,"El offset se sale del tamaño del inodo\n");      
@@ -71,53 +78,57 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
             nbytes = inodo.tamEnBytesLog-offset;
         }
         
+           
         unsigned int BLinicio = offset/BLOCKSIZE;           //Primer BL donde vamos a leer
-        unsigned int BLfinal = (offset+nbytes-1)/BLOCKSIZE; //Ultimo bloque que vamos a leer    
+        unsigned int BLfinal = ceil((offset+nbytes-1)/BLOCKSIZE); //Ultimo bloque que vamos a leer  
         int desp1 = offset%BLOCKSIZE;
-        
-        unsigned char buf_bloque[BLOCKSIZE];
-        memset(buf_bloque, 0, BLOCKSIZE);
-        memset(buf_original, 0, BLOCKSIZE);
-        int BF;
+
         //caso en que hay que leer el primer bloque
         BF= traducir_bloque_inodo(ninodo,BLinicio,0);
         if(BF == -1){   //Si el bloque no existe, devolvemos los bytes que deberiamos haber leido
-            return nbytes;
+            leidos += BLOCKSIZE-desp1;
         } else {
-            if (nbytes <=BLOCKSIZE-desp1){           
+            if (nbytes <=BLOCKSIZE-desp1){   
+                memset(buf_bloque, 0, BLOCKSIZE);        
                 bread(BF,buf_bloque);
-                memcpy(buf_original,buf_bloque+desp1,nbytes); 
+                memcpy(buf_original,buf_bloque+desp1,BLOCKSIZE-desp1); 
                 leidos += nbytes;  
-                printf("eSTOY EN LA PRIMERA%d\n", leidos);
+                //printf("ESTOY EN LA PRIMERA%d\n", leidos);
                 return leidos;
-            } else { 
-                printf("Estoy en la segunda%d\n", leidos);
+            } else {    
+                memset(buf_bloque, 0, BLOCKSIZE); 
                 bread(BF,buf_bloque);
                 memcpy(buf_original,buf_bloque+desp1,BLOCKSIZE-desp1);
                 leidos+=BLOCKSIZE-desp1;    
-                //bloques intermedios se leen enteros
-                for(int i =BLinicio+1;i < BLfinal;i++){
-                    BF= traducir_bloque_inodo(ninodo,i,0);
-                    if (BF != -1){
-                        bread(BF, buf_bloque);
-                        memcpy(buf_original+leidos, buf_bloque, BLOCKSIZE);
-                        
-                    }  
-                    leidos += BLOCKSIZE;  
-                }
-                //se escribe el ultimo bloque
-                int desp2= (offset+nbytes-1)%BLOCKSIZE;
-                if(BLinicio!=BLfinal){
-                    BF= traducir_bloque_inodo(ninodo,BLfinal,0);
-                    if (BF != -1){ //Que exsista el bloque y no sea el mismo del principio
-                        memset(buf_bloque,0,BLOCKSIZE);
-                        bread(BF,buf_bloque); 
-                        memcpy (buf_original+leidos, buf_bloque, desp2 + 1); 
-                    }
-                    leidos += desp2+1;
+                //printf("Estoy en la segunda.1 %d\n", leidos);
+                //printf("%s\n", buf_bloque );
                 }
             }
-       }
+            //bloques intermedios se leen enteros
+            for(int i = BLinicio+1;i < BLfinal;i++){
+                BF2= traducir_bloque_inodo(ninodo,i,0);
+                if (BF2 != -1){
+                    memset(buf_bloque, 0, BLOCKSIZE);
+                    bread(BF2, buf_bloque);
+                    memcpy(buf_original+leidos, buf_bloque, BLOCKSIZE);
+                    //printf("Estoy en la segunda.2 %d\n", leidos);
+                    //printf("%s\n", buf_bloque );   
+                }  
+                leidos += BLOCKSIZE;  
+            }
+            //se escribe el ultimo bloque
+            int desp2 = (offset+nbytes-1)%BLOCKSIZE;
+            if(BLinicio!=BLfinal){
+                BF2= traducir_bloque_inodo(ninodo,BLfinal,0);
+                if (BF2 != -1 && BF != BF2){ //Que exsista el bloque y no sea el mismo del principio            
+                    memset(buf_bloque,0,BLOCKSIZE);
+                    bread(BF2,buf_bloque); 
+                    memcpy (buf_original+leidos, buf_bloque, desp2 + 1); 
+                    //printf("Estoy en la segunda.3 %d\n", leidos);
+                    //printf("%s\n", buf_bloque );
+                }
+                leidos += desp2+1;
+            }
     } else {
         printf("No hay permisos de lectura\n");
     }

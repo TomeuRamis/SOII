@@ -4,17 +4,29 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+<<<<<<< HEAD
 
+=======
+>>>>>>> 16f5f16491ad8ac93c440e6f1402a802c52fd34f
         {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
+<<<<<<< HEAD
             "program": "${workspaceFolder}/mi_mkdir",
             "args": ["disco","6","/dir1/"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": true,
+=======
+            "program": "${workspaceFolder}/leer",
+            "args": ["disco", "2"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+>>>>>>> 16f5f16491ad8ac93c440e6f1402a802c52fd34f
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -25,6 +37,7 @@
             ]
         },
         {
+<<<<<<< HEAD
             "name": "gcc build and debug active file",
             "type": "cppdbg",
             "request": "launch",
@@ -44,6 +57,12 @@
             ],
             "preLaunchTask": "gcc build active file",
             "miDebuggerPath": "/usr/bin/gdb"
+=======
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${file}"
+>>>>>>> 16f5f16491ad8ac93c440e6f1402a802c52fd34f
         }
     ]
 }
