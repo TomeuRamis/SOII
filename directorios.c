@@ -4,7 +4,7 @@ int extraer_camino(const char *camino, char *inicial, char *final){
     printf("Llego a: extraer_camino\n");
     char *prinpal= malloc(sizeof(camino));
     prinpal = strchr(camino,'/');
-    final = malloc(sizeof(camino));
+    
     inicial="";
     if (!strcmp(prinpal,"/")){
         printf("Los caminos deben empezar por /\n");
@@ -26,10 +26,11 @@ int extraer_camino(const char *camino, char *inicial, char *final){
         printf("Llego a: ext_cam el camino termina en fichero\n");
         printf("Inicial: %s, Final: %s",inicial,final);
         return 0;
-    } else {
+    } else {     
         printf("Llego a: ext_cam es un directorio %s %s\n",final,camino_aux);
-        //strcpy(final,camino_aux);
-        final=camino_aux;
+        final = "";
+        strcpy(final,camino_aux);
+        //final=camino_aux;
         printf("Inicial: %s, Final: %s",inicial,final);
         return 1; 
     }
