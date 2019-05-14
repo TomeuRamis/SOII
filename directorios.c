@@ -4,12 +4,7 @@ int extraer_camino(const char *camino, char *inicial, char *final){
     //printf("Llego a: extraer_camino\n");
     char *prinpal= malloc(sizeof(strlen(camino)));
     prinpal = strchr(camino,'/');
-<<<<<<< HEAD
     //inicial="";
-=======
-    
-    inicial="";
->>>>>>> 16f5f16491ad8ac93c440e6f1402a802c52fd34f
     if (!strcmp(prinpal,"/")){
         printf("Los caminos deben empezar por /\n");
         return -1;
@@ -19,16 +14,14 @@ int extraer_camino(const char *camino, char *inicial, char *final){
     prinpal++;
     camino_aux = prinpal;
     //printf("Prinpal: %s",*prinpal);
-    int cont = 0;
-    while ((*camino_aux!="/")&&(*camino_aux!=NULL)){
-        //printf("En while, camino_aux: %c\n",*camino_aux);
-        camino_aux++;
-        cont++;
-    }
-    camino_aux--;
+    
+    camino_aux = strchr(camino_aux, '/');
+    int cont = camino_aux-prinpal;
+    //camino_aux--;
+
     //printf("Llego a: extraer camino busco entrada (%d)\n",cont);
     //inicial = prinpal+1;                                    // EXtremadamente cutre
-    strncpy(inicial,prinpal,cont-1);
+    strncpy(inicial,prinpal,cont);
     //inicial = strndup(inicial, cont-1);  
     //printf("INicial :%s\n", inicial);
     //printf("Camino_aux: %c\n",*camino_aux);
@@ -36,19 +29,10 @@ int extraer_camino(const char *camino, char *inicial, char *final){
         //printf("Llego a: ext_cam el camino termina en fichero\n");
         printf("Inicial: %s, Final: %s",inicial,final);
         return 0;
-<<<<<<< HEAD
     } else {
         //printf("Llego a: ext_cam es un directorio %s %s\n",final,camino_aux);
         strcpy(final,camino_aux);
         printf("Inicial: %s, Final: %s\n",inicial,final);
-=======
-    } else {     
-        printf("Llego a: ext_cam es un directorio %s %s\n",final,camino_aux);
-        final = "";
-        strcpy(final,camino_aux);
-        //final=camino_aux;
-        printf("Inicial: %s, Final: %s",inicial,final);
->>>>>>> 16f5f16491ad8ac93c440e6f1402a802c52fd34f
         return 1; 
     }
 }
@@ -83,15 +67,16 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     nentrada = 0;
     if(num_entradas>0){
         mi_read_f(*p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
-             
-        while( (nentrada < num_entradas)&&(inicial != entrada.nombre)){
-            //printf("El de abajo miente\n");
             nentrada++;
+        while( (nentrada < num_entradas)&&(strcmp(inicial, entrada.nombre) != 0)) {
+            //printf("El de abajo miente\n");
             mi_read_f(*p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada));
+            nentrada++;
         }
     }
+    leer_inodo(entrada.ninodo, &inodo);
     char itipo= inodo.tipo;
-    if (nentrada==num_entradas) {
+    if (nentrada==num_entradas && strcmp(inicial, entrada.nombre) != 0) {
         switch (reservar) {
             case 0:
                 printf("Error no exsiste entrada consulta"); 
@@ -135,7 +120,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         }
 
     }
-    if( strcmp(final, "")){ //Puede que sea /0
+    if( itipo == 'd' && strcmp(final, "/") == 0){ 
         if ((nentrada < num_entradas)&&(reservar=1)) {
             printf("Error entrada ya exsistente");
             return -8; //Error entrada ya exsistente
@@ -145,6 +130,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         return 1; //Exit success
     } else {
         p_inodo_dir = &entrada.ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
+        printf("Final de la recursividad\n");
         return buscar_entrada(final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos);
     }
 }

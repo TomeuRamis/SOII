@@ -12,7 +12,6 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         unsigned char buf_bloque[BLOCKSIZE];
         int BF;
         
-        
         memset(buf_bloque,0,BLOCKSIZE);
         BF= traducir_bloque_inodo(ninodo,BLinicio,1);
         //Caso en que el texto cabe en un solo bloque
