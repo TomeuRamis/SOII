@@ -120,16 +120,16 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         }
 
     }
-    if( itipo == 'd' && strcmp(final, "/") == 0){ 
+    if( (itipo == 'd' && strcmp(final, "/") == 0)||(itipo =='f' && strcmp(final, "\0"))){ 
         if ((nentrada < num_entradas)&&(reservar=1)) {
             printf("Error entrada ya exsistente");
             return -8; //Error entrada ya exsistente
         }
-        p_inodo = &entrada.ninodo; //REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
+        *p_inodo = entrada.ninodo; //REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         *p_entrada = nentrada;//Quiza es sospechoso el *, añadido como parche
         return 1; //Exit success
     } else {
-        p_inodo_dir = &entrada.ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
+        *p_inodo_dir = entrada.ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         printf("Final de la recursividad\n");
         return buscar_entrada(final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos);
     }
