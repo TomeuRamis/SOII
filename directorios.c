@@ -120,7 +120,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         }
 
     }
-    if( (itipo == 'd' && strcmp(final, "/") == 0)||(itipo =='f' && strcmp(final, "\0"))){ 
+    if( (itipo == 'd' && strcmp(final, "/") == 0)||(itipo =='f' && strcmp(final, "\0")==0)){ 
         if ((nentrada < num_entradas)&&(reservar=1)) {
             printf("Error entrada ya exsistente");
             return -8; //Error entrada ya exsistente
@@ -137,13 +137,10 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
 
 int mi_creat(const char *camino, unsigned char permisos){
     printf("Llego a:mi creat\n");
-    unsigned int aux_entrada=0;
-    unsigned int aux_inodo_dir=0;
-    unsigned int aux_inodo =0;
-    unsigned int *p_entrada =&aux_entrada;
-    unsigned int *p_inodo_dir=&aux_inodo_dir;
-    unsigned int *p_inodo=&aux_inodo; 
-    int error = buscar_entrada(camino,p_inodo_dir,p_inodo,p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
+    unsigned int p_entrada =0;
+    unsigned int p_inodo_dir=0;
+    unsigned int p_inodo=0; 
+    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
     switch (error){
         case -2:
             printf("Error con los permisos de lectura");
