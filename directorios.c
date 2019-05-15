@@ -25,7 +25,7 @@ int extraer_camino(const char *camino, char *inicial, char *final){
     //inicial = strndup(inicial, cont-1);  
     //printf("INicial :%s\n", inicial);
     //printf("Camino_aux: %c\n",*camino_aux);
-    if (*camino_aux==NULL){ // Quiza cont-1
+    if (*camino_aux=='\0'){ // Quiza cont-1
         //printf("Llego a: ext_cam el camino termina en fichero\n");
         printf("Inicial: %s, Final: %s",inicial,final);
         return 0;
@@ -57,7 +57,6 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         return -1; //Error al extraer camino (falta empezar por "/")
     }
     printf("buscar_entrada()→ inicial: %s, final: %s, reservar: %d\n",inicial,final,reservar);
-    int exp_inodo_dir = *p_inodo_dir;
     leer_inodo(*p_inodo_dir,&inodo);//no lee el inodo que toca
     if(permisos&&4!=4) {
         printf("Error de permisos de lectura");
@@ -120,7 +119,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         }
 
     }
-    if( itipo == 'd' && strcmp(final, "/") == 0){ 
+    if( (itipo == 'd' && strcmp(final, "/") == 0)||(itipo =='f' && strcmp(final, "\0")==0)){ 
         if ((nentrada < num_entradas)&&(reservar=1)) {
             printf("Error entrada ya exsistente");
             return -8; //Error entrada ya exsistente
@@ -131,15 +130,24 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     } else {
         *p_inodo_dir = entrada.ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         printf("Final de la recursividad\n");
-        return buscar_entrada(final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos);
+        unsigned int aux_entrada = *p_entrada;
+        unsigned int aux_p_inodo_dir = *p_inodo_dir;
+        unsigned int aux_p_inodo = *p_inodo;
+        return buscar_entrada(final, &aux_p_inodo_dir, &aux_p_inodo, &aux_entrada, reservar, permisos);
     }
 }
 
 int mi_creat(const char *camino, unsigned char permisos){
     printf("Llego a:mi creat\n");
+<<<<<<< HEAD
     unsigned int p_entrada;
     unsigned int p_inodo_dir;
     unsigned int p_inodo;
+=======
+    unsigned int p_entrada=0;
+    unsigned int p_inodo_dir=0;
+    unsigned int p_inodo=0; 
+>>>>>>> b246ed688cc4b14c10f4baf3c919bbf7e1a1e4ec
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
     switch (error){
         case -2:
