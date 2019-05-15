@@ -45,7 +45,8 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     final=(char*)camino_parcial;//caution
     int nentrada;
     struct inodo inodo;
-    struct entrada entrada;
+    struct entrada *entrada = malloc(sizeof(struct  entrada));
+    
     if (strcmp(camino_parcial,"/")==0){
         printf("Llego a: buscar entrada directorio raiz\n");
         p_inodo=0;
@@ -65,17 +66,17 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     int num_entradas = inodo.tamEnBytesLog/sizeof(struct entrada);
     nentrada = 0;
     if(num_entradas>0){
-        mi_read_f(*p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
+        mi_read_f(*p_inodo_dir, entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
             nentrada++;
-        while( (nentrada < num_entradas)&&(strcmp(inicial, entrada.nombre) != 0)) {
+        while( (nentrada < num_entradas)&&(strcmp(inicial, entrada ->nombre) != 0)) {
             //printf("El de abajo miente\n");
-            mi_read_f(*p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada));
+            mi_read_f(*p_inodo_dir, entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada));
             nentrada++;
         }
     }
-    leer_inodo(entrada.ninodo, &inodo);
+    leer_inodo(entrada ->ninodo, &inodo);
     char itipo= inodo.tipo;
-    if (nentrada==num_entradas && strcmp(inicial, entrada.nombre) != 0) {
+    if (nentrada==num_entradas && strcmp(inicial, entrada ->nombre) != 0) {
         switch (reservar) {
             case 0:
                 printf("Error no exsiste entrada consulta"); 
@@ -89,27 +90,27 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
                 printf("Error permisos escritura");
                 return -5; //Error permisos escritura
             } else {
-                memcpy(entrada.nombre, inicial, sizeof(entrada.nombre));
+                memcpy(entrada->nombre, inicial, sizeof(entrada ->nombre));
                 if (itipo=='d'){
                     if ((strcmp(final,"/")==0)){
-                        entrada.ninodo = reservar_inodo('d', permisos);
-                        leer_inodo(entrada.ninodo,&inodo);
-                        printf("[buscar_entrada()→ entrada.nombre: %s, entrada.ninodo: %d]\n",entrada.nombre,entrada.ninodo);
-                        printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]",entrada.ninodo,inodo.tipo,inodo.permisos);
+                        entrada ->ninodo = reservar_inodo('d', permisos);
+                        leer_inodo(entrada ->ninodo,&inodo);
+                        printf("[buscar_entrada()→ entrada.nombre: %s, entrada.ninodo: %d]\n",entrada ->nombre,entrada ->ninodo);
+                        printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]",entrada ->ninodo,inodo.tipo,inodo.permisos);
                     } else {
                         printf("Error no existe directorio intermedio");
                         return -6; //Error no exsiste directorio intermedio
                     }
                 } else {
-                    entrada.ninodo = reservar_inodo('f', permisos);
-                    leer_inodo(entrada.ninodo,&inodo);
-                    printf("[buscar_entrada()→ entrada.nombre: %s, entrada.ninodo: %d]\n",entrada.nombre,entrada.ninodo);
-                    printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]",entrada.ninodo,inodo.tipo,inodo.permisos);
+                    entrada ->ninodo = reservar_inodo('f', permisos);
+                    leer_inodo(entrada ->ninodo,&inodo);
+                    printf("[buscar_entrada()→ entrada.nombre: %s, entrada.ninodo: %d]\n",entrada ->nombre,entrada ->ninodo);
+                    printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]",entrada ->ninodo,inodo.tipo,inodo.permisos);
                 }
                 int escritos = mi_write_f(*p_inodo_dir, &entrada, num_entradas*sizeof(struct entrada), sizeof(struct entrada));
                 if(escritos != sizeof(struct entrada)){
-                    if (entrada.ninodo != -1){
-                        liberar_inodo(entrada.ninodo);
+                    if (entrada ->ninodo != -1){
+                        liberar_inodo(entrada ->ninodo);
                     }
                     printf("Error EXIT_FAILURE");
                     return -7; //Error EXIT_FAILURE
@@ -124,30 +125,21 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
             printf("Error entrada ya exsistente");
             return -8; //Error entrada ya exsistente
         }
-        *p_inodo = entrada.ninodo; //REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
+        *p_inodo = entrada ->ninodo; //REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         *p_entrada = nentrada;//Quiza es sospechoso el *, añadido como parche
         return 1; //Exit success
     } else {
-        *p_inodo_dir = entrada.ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
+        *p_inodo_dir = entrada ->ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         printf("Final de la recursividad\n");
-        unsigned int aux_entrada = *p_entrada;
-        unsigned int aux_p_inodo_dir = *p_inodo_dir;
-        unsigned int aux_p_inodo = *p_inodo;
-        return buscar_entrada(final, &aux_p_inodo_dir, &aux_p_inodo, &aux_entrada, reservar, permisos);
+        return buscar_entrada(final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos);
     }
 }
 
 int mi_creat(const char *camino, unsigned char permisos){
     printf("Llego a:mi creat\n");
-<<<<<<< HEAD
-    unsigned int p_entrada;
-    unsigned int p_inodo_dir;
-    unsigned int p_inodo;
-=======
     unsigned int p_entrada=0;
     unsigned int p_inodo_dir=0;
     unsigned int p_inodo=0; 
->>>>>>> b246ed688cc4b14c10f4baf3c919bbf7e1a1e4ec
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
     switch (error){
         case -2:
