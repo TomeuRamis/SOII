@@ -11,14 +11,15 @@ int extraer_camino(const char *camino, char *inicial, char *final){
     prinpal++;
     camino_aux = prinpal;
     camino_aux = strchr(camino_aux, '/');
+    if(camino_aux==NULL){
+        strcpy(inicial,prinpal);
+        strcpy(final,"");
+        return 0; //tipo f
+    }
     int cont = camino_aux-prinpal;                                 // EXtremadamente cutre
     strncpy(inicial,prinpal,cont);
-    if (*camino_aux=='\0'){ // Quiza cont-1
-        return 0;
-    } else {
-        strcpy(final,camino_aux);
-        return 1; 
-    }
+    strcpy(final,camino_aux);
+    return 1; // tipo d
 }
 //p_inodo no se actualiza, es posible que al empezar p_inodo = p_inod_dir y se actualiza p_inodo_dir
 int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir,
@@ -47,8 +48,8 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     }
     printf("[buscar_entrada()→ inicial: %s, final: %s, reservar: %d]\n",inicial,final,reservar);
     leer_inodo(*p_inodo_dir,&inodo);//no lee el inodo que toca
-    if(permisos&&4!=4) {
-        printf("Error de permisos de lectura");
+    if((inodo.permisos&4)!=4) {
+        printf("Error de permisos de lectura\n");
         return -2; //Error de permisos de lectura
     }
     int num_entradas = inodo.tamEnBytesLog/sizeof(struct entrada);
@@ -62,34 +63,33 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
             nentrada++;
         }
     }
-    leer_inodo(entrada.ninodo, &inodo);
-    char itipo= inodo.tipo;
     if (nentrada==num_entradas && strcmp(inicial, entrada.nombre) != 0) {
         switch (reservar) {
             case 0:
-                printf("Error no exsiste entrada consulta");
+                printf("Error no exsiste entrada consulta\n");
                 return -3; //Error no exsiste entrada consulta
             case 1: //modo escritura
-            if (itipo=='f'){
-                printf("Error no se puede crear entrada en un fichero");
+            if (inodo.tipo=='f'){
+                printf("Error no se puede crear entrada en un fichero\n");
                 return -4; //Error no se puede crear entrada en un fichero
             }
-            if (inodo.permisos&&2!=2){
-                printf("Error permisos escritura");
+            if ((inodo.permisos&2)!=2){
+                printf("Error permisos escritura\n");
                 return -5; //Error permisos escritura
             } else {
+                leer_inodo(entrada.ninodo, &inodo);
                 memcpy(entrada.nombre, inicial, sizeof(entrada.nombre));
-                if (itipo=='d'){
+                if (tipo==1){ //tipo es directorio
                     if ((strcmp(final,"/")==0)){
                         entrada.ninodo = reservar_inodo('d', permisos);
                         leer_inodo(entrada.ninodo,&inodo);
                         printf("[buscar_entrada()→ entrada.nombre: %s, entrada.ninodo: %d]\n",entrada.nombre,entrada.ninodo);
                         printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]\n",entrada.ninodo,inodo.tipo,inodo.permisos);
                     } else {
-                        printf("Error no existe directorio intermedio");
+                        printf("Error no existe directorio intermedio\n");
                         return -6; //Error no exsiste directorio intermedio
                     }
-                } else {
+                } else { // tipo es fichero
                     entrada.ninodo = reservar_inodo('f', permisos);
                     leer_inodo(entrada.ninodo,&inodo);
                     printf("[buscar_entrada()→ entrada.nombre: %s, entrada.ninodo: %d]\n",entrada.nombre,entrada.ninodo);
@@ -100,23 +100,23 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
                     if (entrada.ninodo != -1){
                         liberar_inodo(entrada.ninodo);
                     }
-                    printf("Error EXIT_FAILURE");
-                    return EXIT_FAILURE; //Error EXIT_FAILURE
+                    printf("Error EXIT_FAILURE\n");
+                    return -7; //Error EXIT_FAILURE
                 }
             }
             break;
         }
  
     }
-    if( (itipo == 'd' && strcmp(final, "/") == 0)||(itipo =='f' && strcmp(final, "\0")==0)){
+    if( (inodo.tipo == 'd' && strcmp(final, "/") == 0)||(inodo.tipo =='f' && strcmp(final, "\0")==0)){
         if ((nentrada < num_entradas)&&(reservar=1)) {
-            printf("Error entrada ya exsistente");
+            printf("Error entrada ya exsistente\n");
             return -8; //Error entrada ya exsistente
         }
         *p_inodo = entrada.ninodo; //REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         *p_entrada = nentrada;//Quiza es sospechoso el *, añadido como parche
         printf("Final de la recursividad\n");
-        return EXIT_SUCCESS; //Exit success
+        return MI_EXIT_SUCCESS; //Exit success
     } else {
         *p_inodo_dir = entrada.ninodo;//REVISAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
         return buscar_entrada(final, p_inodo_dir, p_inodo, p_entrada, reservar, permisos);
@@ -136,18 +136,21 @@ int mi_dir(const char *camino, char *buffer){
     unsigned int p_inodo_dir =0;
     unsigned int p_entrada;
     struct inodo inodo;
+    struct entrada entrada;
     int nentradas;
     int offset = 0;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
-    if (error == 1) {
+    if (error >= 0) {
         leer_inodo(p_inodo,&inodo);
-        if (inodo.tipo=='d' && inodo.permisos&&4==4){
-            nentradas = (inodo.tamEnBytesLog/sizeof(struct entrada))+1;
+        if (inodo.tipo=='d' && (inodo.permisos&4)==4){
+            nentradas = (inodo.tamEnBytesLog/sizeof(struct entrada));
         }
         for(int i = 0; i < nentradas; i++){
-            offset+= mi_read_f(p_inodo,buffer,offset,sizeof(struct entrada));
-            buffer+='|';
+            mi_read_f(p_inodo_dir, &entrada, i*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
+            strcat(buffer,entrada.nombre);
+            strcat(buffer," | ");
         }
+        strcat(buffer,"\n");
         return 0;
     }
     return -1;
@@ -158,7 +161,7 @@ int mi_chmod(const char *camino, unsigned char permisos){
     unsigned int p_entrada;
     unsigned int p_inodo_dir =0;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
-    if (error ==1) {
+    if (error == 1) {
         mi_chmod_f(p_inodo,permisos);
         return 0;
     }

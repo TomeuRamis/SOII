@@ -5,7 +5,7 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
     struct inodo inodo;
     int escritos = 0;
     leer_inodo(ninodo,&inodo);
-    if (inodo.permisos&&2==2){
+    if ((inodo.permisos&2)==2){
         unsigned int BLinicio = offset/BLOCKSIZE;//Primer BL donde vamos a escribir
         unsigned int BLfinal = ceil((offset+nbytes-1)/BLOCKSIZE);//Ultimo bloque en que vamos a escribir
         int desp1 = offset%BLOCKSIZE;
@@ -61,7 +61,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
     int leidos = 0;
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
-    if (inodo.permisos&&4==4){              //Comprobar que tenemos permisos para leer
+    if ((inodo.permisos&4)==4){              //Comprobar que tenemos permisos para leer
        
         unsigned char buf_bloque[BLOCKSIZE];
         memset(buf_bloque, 0, BLOCKSIZE);
@@ -87,7 +87,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         if(BF == -1){   //Si el bloque no existe, devolvemos los bytes que deberiamos haber leido
             leidos += BLOCKSIZE-desp1;
         } else {
-            if (nbytes <=BLOCKSIZE-desp1){   //revisar, meter BLinicio==BLfinal antes
+            if (BLinicio==BLfinal){   //Se ha cambiado la condicion del if
                 memset(buf_bloque, 0, BLOCKSIZE);        
                 bread(BF,buf_bloque);
                 memcpy(buf_original,buf_bloque+desp1, nbytes); 
@@ -162,7 +162,7 @@ int mi_truncar_f(unsigned int ninodo,unsigned int nbytes){
     unsigned int nblogico;
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
-    if (inodo.permisos&&2==2){
+    if ((inodo.permisos&2)==2){
         if (nbytes >= inodo.tamEnBytesLog){         //No se puede truncar un archivo a un tamaño superior
             fprintf(stderr, "ERROR: el tamaño a truncar es demasiado grande.\n");
         } else{

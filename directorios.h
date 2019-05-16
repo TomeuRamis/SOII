@@ -1,5 +1,8 @@
 #include "ficheros.h"
 
+#define MI_EXIT_SUCCESS 1
+
+
 struct entrada {
 char nombre[60];  //En el SF ext2 la longitud del nombre es 255
 unsigned int ninodo;
