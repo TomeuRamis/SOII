@@ -146,7 +146,7 @@ int mi_dir(const char *camino, char *buffer){
             nentradas = (inodo.tamEnBytesLog/sizeof(struct entrada));
         }
         for(int i = 0; i < nentradas; i++){
-            mi_read_f(p_inodo_dir, &entrada, i*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
+            mi_read_f(p_inodo, &entrada, i*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
             strcat(buffer,entrada.nombre);
             strcat(buffer," | ");
         }

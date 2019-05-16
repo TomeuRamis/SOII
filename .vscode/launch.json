@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/mi_stat",
+            "program": "${workspaceFolder}/mi_ls",
             "args": ["disco","/dir1/"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
