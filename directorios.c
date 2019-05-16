@@ -160,20 +160,20 @@ int mi_creat(const char *camino, unsigned char permisos){
 }
 
 int mi_dir(const char *camino, char *buffer){
-    unsigned int *p_inodo = 0;
-    unsigned int *p_inodo_dir =0;
-    unsigned int *p_entrada =0;
+    unsigned int p_inodo;
+    unsigned int p_inodo_dir =0;
+    unsigned int p_entrada;
     struct inodo inodo;
     int nentradas;
     int offset = 0;
-    int error = buscar_entrada(camino,p_inodo_dir,p_inodo,p_entrada,0,4);
+    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error == 1) {
-        leer_inodo(*p_inodo,&inodo);
+        leer_inodo(p_inodo,&inodo);
         if (inodo.tipo=='d' && inodo.permisos&&4==4){
             nentradas = (inodo.tamEnBytesLog/sizeof(struct entrada))+1;
         }
         for(int i = 0; i < nentradas; i++){
-            offset+= mi_read_f(*p_inodo,buffer,offset,sizeof(struct entrada));
+            offset+= mi_read_f(p_inodo,buffer,offset,sizeof(struct entrada));
             buffer+='|';
         }
         return 0;
@@ -182,24 +182,24 @@ int mi_dir(const char *camino, char *buffer){
 }
 
 int mi_chmod(const char *camino, unsigned char permisos){
-    unsigned int *p_inodo = 0;
-    unsigned int *p_entrada =0;
-    unsigned int *p_inodo_dir =0;
-    int error = buscar_entrada(camino,p_inodo_dir,p_inodo,p_entrada,0,4);
+    unsigned int p_inodo;
+    unsigned int p_entrada;
+    unsigned int p_inodo_dir =0;
+    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1) {
-        mi_chmod_f(*p_inodo,permisos);
+        mi_chmod_f(p_inodo,permisos);
         return 0;
     }
     return -1;
 }
 
 int mi_stat(const char *camino, struct STAT *p_stat){
-    unsigned int *p_inodo = 0;
-    unsigned int *p_entrada =0;
-    unsigned int *p_inodo_dir =0;
-    int error = buscar_entrada(camino,p_inodo_dir,p_inodo,p_entrada,0,4);
+    unsigned int p_inodo;
+    unsigned int p_entrada;
+    unsigned int p_inodo_dir =0;
+    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1) {
-        mi_stat_f(*p_inodo,p_stat);
+        mi_stat_f(p_inodo,p_stat);
         return 0;
     }
     return -1;
@@ -237,42 +237,62 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
 
 int mi_link(const char *camino1, const char *camino2){
 
-    //Comprobar que es un fichero
-    char *camino_aux1 = camino1;
-    char *camino_aux2 = camino2;
-    int cont =0;
-    while (cont <strlen(camino1)-1){
-        camino_aux1++;
-        cont ++;
+    unsigned int p_inodo1 = 0;
+    unsigned int p_entrada1 =0;
+    unsigned int p_inodo_dir1 =0;
+
+    unsigned int p_inodo2 = 0;
+    unsigned int p_entrada2 =0;
+    unsigned int p_inodo_dir2 =0;
+    struct inodo inodo;
+    struct entrada entrada;
+    int error = buscar_entrada(camino1,&p_inodo_dir1,&p_inodo1,&p_entrada1,0,4);
+    leer_inodo(p_inodo1,&inodo); 
+    if (error!=1){
+        printf("No existe camino1");
+        return -1;
     }
-    cont =0;
-    while (cont <strlen(camino2)-1){
-        camino_aux2++;
-        cont ++;
+    if (inodo.permisos&&4!=4){
+        printf("No hay permisos de lectura");
+        return -1;
     }
-    if((*camino_aux1='/')&&(*camino_aux2='/')){
-        printf("La ruta no es un fichero");
-        return 0;
-    } else {
-        unsigned int p_inodo1 = 0;
-        unsigned int p_entrada =0;
-        unsigned int p_inodo_dir =0;
-        struct inodo inodo;
-        int error = buscar_entrada(camino1,&p_inodo_dir,&p_inodo1,&p_entrada,0,4);
-        leer_inodo(p_inodo1,&inodo); 
-        if (error!=1){
-            printf("No existe camino1");
-            return 0;
+    error =buscar_entrada(camino2,&p_inodo_dir2,&p_inodo2,&p_entrada2,1,6);//Posible necesidad de nuevos p_inodo etc.
+    if (error==-8){
+        return -1;//Ruta de enlace ya existe;
+    }
+    mi_read_f(p_inodo_dir2, &entrada, p_entrada2*sizeof(struct  entrada), sizeof(struct entrada));
+    entrada.ninodo= p_inodo1;
+    mi_write_f(p_inodo_dir2, &entrada, p_entrada2*sizeof(struct entrada), sizeof(struct entrada));
+    liberar_inodo(p_inodo2);//duda de si es este
+    leer_inodo(p_inodo1,&inodo);
+    inodo.nlinks++;
+    inodo.ctime == time(NULL);
+    escribir_inodo(p_inodo1,inodo);
+    return 0;  
+}
+
+int mi_unlink(const char *camino){
+    unsigned int p_inodo = 0;
+    unsigned int p_entrada =0;
+    unsigned int p_inodo_dir =0;
+    struct inodo inodo;
+    unsigned char *camino_aux=camino;
+    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
+    if (error ==1){
+        leer_inodo(p_inodo_dir,&inodo);
+        int cont =0;
+        while (cont <strlen(camino)-1){
+            camino_aux++;
+            cont ++;
         }
-        if (inodo.permisos&&4!=4){
-            printf("No hay permisos de lectura");
-            return 0;
+        if ((*camino_aux=='/')&&(inodo.tamEnBytesLog>0)){
+            int nentradas = inodo.tamEnBytesLog/sizeof(struct entrada);
+            if(p_entrada == nentradas - 1){
+                mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));//qUIZA ES Pinodo
+            } else {
+                struct entrada entrada;
+                mi_read_f(p_inodo_dir,);
+            }
         }
-        error =buscar_entrada(camino2,&p_inodo_dir,&p_inodo1,&p_entrada,0,4);//Posible necesidad de nuevos p_inodo etc.
-        if (error!=1){
-            buscar_entrada(camino2,&p_inodo_dir,&p_inodo1,&p_entrada,1,6);
-            return 0;
-        }
-        
-    }  
+    }
 }

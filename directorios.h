@@ -21,3 +21,4 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
 
 //nivel 11
 int mi_link(const char *camino1, const char *camino2);
+int mi_unlink(const char *camino);
