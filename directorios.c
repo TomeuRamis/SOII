@@ -40,11 +40,17 @@ int extraer_camino(const char *camino, char *inicial, char *final){
 int buscar_entrada(const char *camino_parcial, unsigned int *p_inodo_dir,
 unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char permisos){
     printf("Llego a: buscar_entrada \n");
+    struct entrada entrada;
+
+    // char inical[sizeof(entrada.nombre)];
+    // memset(inical, 0, sizeof(entrada.nombre));
+    // char final[strlen(camino_parcial)];
+    // memset(final, 0, strlen(camino_parcial));
     char *inicial= malloc(sizeof(char));
     char *final=malloc(sizeof(char));
-    int nentrada;
+
+    int nentrada;    
     struct inodo inodo;
-    struct entrada entrada;
     if (strcmp(camino_parcial,"/")==0){
         printf("Llego a: buscar entrada directorio raiz\n");
         *p_inodo=0;

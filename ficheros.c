@@ -79,7 +79,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         
            
         unsigned int BLinicio = offset/BLOCKSIZE;           //Primer BL donde vamos a leer
-        unsigned int BLfinal = ceil((offset+nbytes-1)/BLOCKSIZE); //Ultimo bloque que vamos a leer  
+        unsigned int BLfinal = (offset+nbytes-1)/BLOCKSIZE; //Ultimo bloque que vamos a leer  
         int desp1 = offset%BLOCKSIZE;
 
         //caso en que hay que leer el primer bloque
@@ -87,10 +87,10 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
         if(BF == -1){   //Si el bloque no existe, devolvemos los bytes que deberiamos haber leido
             leidos += BLOCKSIZE-desp1;
         } else {
-            if (nbytes <=BLOCKSIZE-desp1){   
+            if (nbytes <=BLOCKSIZE-desp1){   //revisar, meter BLinicio==BLfinal antes
                 memset(buf_bloque, 0, BLOCKSIZE);        
                 bread(BF,buf_bloque);
-                memcpy(buf_original,buf_bloque+desp1,BLOCKSIZE-desp1); 
+                memcpy(buf_original,buf_bloque+desp1, nbytes); 
                 leidos += nbytes;  
                 //printf("ESTOY EN LA PRIMERA%d\n", leidos);
                 return leidos;
