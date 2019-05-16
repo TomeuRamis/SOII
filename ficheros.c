@@ -90,7 +90,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
             if (nbytes <=BLOCKSIZE-desp1){   
                 memset(buf_bloque, 0, BLOCKSIZE);        
                 bread(BF,buf_bloque);
-                memcpy(buf_original,buf_bloque+desp1,BLOCKSIZE-desp1); 
+                memcpy(buf_original,buf_bloque+desp1,nbytes); 
                 leidos += nbytes;  
                 //printf("ESTOY EN LA PRIMERA%d\n", leidos);
                 return leidos;
