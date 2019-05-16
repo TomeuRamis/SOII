@@ -36,7 +36,7 @@ int main(int argc, char **argv){
         bumount();
     } else {
         printf("Sintaxis: leer <nombre_dispositivo> <ninodo>\n");
-        printf("Se puede rdireccionar el contenido leido a un fichero: \n");
+        printf("Se puede redireccionar el contenido leido a un fichero: \n");
         printf("Sintaxis: leer <nombre_dispositivo> <ninodo> > <fichero>\n");
     }  
     return 0;
