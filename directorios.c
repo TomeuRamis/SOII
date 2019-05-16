@@ -1,38 +1,22 @@
 #include "directorios.h"
 
 int extraer_camino(const char *camino, char *inicial, char *final){
-    //printf("Llego a: extraer_camino\n");
     char *prinpal= malloc(sizeof(strlen(camino)));
     prinpal = strchr(camino,'/');
-    //inicial="";
     if (!strcmp(prinpal,"/")){
         printf("Los caminos deben empezar por /\n");
         return -1;
     }
-    //printf("Llego a: ext_cam el directorio es correcto\n");
     char *camino_aux= malloc(sizeof(strlen(camino))); 
     prinpal++;
     camino_aux = prinpal;
-    //printf("Prinpal: %s",*prinpal);
-    
     camino_aux = strchr(camino_aux, '/');
-    int cont = camino_aux-prinpal;
-    //camino_aux--;
-
-    //printf("Llego a: extraer camino busco entrada (%d)\n",cont);
-    //inicial = prinpal+1;                                    // EXtremadamente cutre
+    int cont = camino_aux-prinpal;                                 // EXtremadamente cutre
     strncpy(inicial,prinpal,cont);
-    //inicial = strndup(inicial, cont-1);  
-    //printf("INicial :%s\n", inicial);
-    //printf("Camino_aux: %c\n",*camino_aux);
     if (*camino_aux=='\0'){ // Quiza cont-1
-        //printf("Llego a: ext_cam el camino termina en fichero\n");
-        printf("Inicial: %s, Final: %s",inicial,final);
         return 0;
     } else {
-        //printf("Llego a: ext_cam es un directorio %s %s\n",final,camino_aux);
         strcpy(final,camino_aux);
-        printf("Inicial: %s, Final: %s\n",inicial,final);
         return 1; 
     }
 }
@@ -141,28 +125,10 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
 
 int mi_creat(const char *camino, unsigned char permisos){
     printf("Llego a:mi creat\n");
-    unsigned int p_entrada=0;
-    unsigned int p_inodo_dir=0;
-    unsigned int p_inodo=0; 
-    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
-    switch (error){
-        case -2:
-            printf("Error con los permisos de lectura");
-        break;
-        case -5:
-            printf("Error permisos de escritura");
-        break;
-        case -8:
-            printf("Entrada ya existente");
-        break;
-        case 0:
-            printf("Llego a: mi_crt camino es directorio raiz\n");
-        break;
-        case 1:
-            printf("Llego a: mi_creat: exit success\n");
-        break;
-    }
-    return error;
+    unsigned int p_entrada = 0;
+    unsigned int p_inodo_dir = 0;
+    unsigned int p_inodo = 0; 
+    return buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
 }
 
 int mi_dir(const char *camino, char *buffer){
@@ -297,7 +263,7 @@ int mi_unlink(const char *camino){
                 mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));//qUIZA ES Pinodo
             } else {
                 struct entrada entrada;
-                mi_read_f(p_inodo_dir,);
+                //mi_read_f(p_inodo_dir);
             }
         }
     }
