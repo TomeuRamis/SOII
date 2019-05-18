@@ -13,7 +13,7 @@ int main(int argc, char **argv){
             camino_aux++;
             cont ++;
         }
-        if(*camino_aux='/'){
+        if(*camino_aux=='/'){
             printf("La ruta no es un fichero");
             return 0;
         } else {
@@ -24,6 +24,7 @@ int main(int argc, char **argv){
             struct inodo inodo;
             int ninodo = strtol(argv[2],NULL,0);
             unsigned char buffer_texto[tambuffer];
+            char *camino=argv[2];
 
             bmount(argv[1]);
             bread(0, &SB);  

@@ -108,6 +108,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         }
  
     }
+    leer_inodo(entrada.ninodo, &inodo);
     if( (inodo.tipo == 'd' && strcmp(final, "/") == 0)||(inodo.tipo =='f' && strcmp(final, "\0")==0)){
         if ((nentrada < num_entradas)&&(reservar=1)) {
             printf("Error entrada ya exsistente\n");
@@ -139,6 +140,7 @@ int mi_dir(const char *camino, char *buffer){
     struct entrada entrada;
     int nentradas;
     int offset = 0;
+    int leidos = 0;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error >= 0) {
         leer_inodo(p_inodo,&inodo);
@@ -146,12 +148,12 @@ int mi_dir(const char *camino, char *buffer){
             nentradas = (inodo.tamEnBytesLog/sizeof(struct entrada));
         }
         for(int i = 0; i < nentradas; i++){
-            mi_read_f(p_inodo, &entrada, i*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
+            leidos = mi_read_f(p_inodo, &entrada, i*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
             strcat(buffer,entrada.nombre);
             strcat(buffer," | ");
         }
         strcat(buffer,"\n");
-        return 0;
+        return leidos;
     }
     return -1;
 }
@@ -196,8 +198,8 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
 }
 
 int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned int nbytes){
-    unsigned int p_inodo = 0;
-    unsigned int p_entrada =0;
+    unsigned int p_inodo;
+    unsigned int p_entrada;
     unsigned int p_inodo_dir =0;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){

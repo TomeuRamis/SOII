@@ -11,17 +11,19 @@ int main(int argc, char **argv){
             camino_aux++;
             cont ++;
         }
-        if(*camino_aux='/'){
+        if(*camino_aux=='/'){
             printf("La ruta no es un fichero");
             return 0;
+        }else{
             bmount(argv[1]);
             bread(0, &SB);
             char *texto= argv[3];
             printf("Longitud texto: %ld\n\n", strlen(texto));
             unsigned char buffer[strlen(texto)];
             memcpy(buffer, texto, strlen(texto));  
-            int offset = argv[4];  
-            int bytes_escritos = mi_write(camino,buffer,offset,strlen(texto)); //Escribimos el texto
+            int offset = atoi(argv[4]);  
+            unsigned int nbytes=strlen(texto);
+            int bytes_escritos = mi_write(camino,&buffer,offset,nbytes); //Escribimos el texto
             int bloques_escritos= (bytes_escritos/BLOCKSIZE);
             if (bytes_escritos % BLOCKSIZE){    //Calculamos si se necesita un bloque extra
                 bloques_escritos++;

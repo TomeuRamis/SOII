@@ -5,10 +5,11 @@ int main(int argc, char **argv){
         bmount(argv[1]);
         bread(0, &SB);
         char *buffer =malloc(sizeof(char));
-        mi_dir(argv[2],buffer);
+        int tam = mi_dir(argv[2],buffer);
         write(1,buffer,sizeof(buffer));
+        printf("\nTamaño: %d \n",tam);
         bumount();
     } else {
-        printf("Sintaxi: ./mi_ls <disco> </ruta_directorio>");
+        printf("Sintaxi: ./mi_ls <disco> </ruta_directorio>\n");
     }
 }
