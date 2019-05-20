@@ -54,7 +54,10 @@ int mi_write_f(unsigned int ninodo,const void *buf_original, unsigned int offset
         }
         inodo.mtime = time(NULL);
         escribir_inodo(ninodo,inodo);
+    } else {    //No hay permisos de lectura
+        printf("Error permisos denegados de lectura. \n");
     }
+    
     return escritos;
 }
 
