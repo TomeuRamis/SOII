@@ -243,7 +243,7 @@ int mi_link(const char *camino1, const char *camino2){
     liberar_inodo(p_inodo2);//duda de si es este
     leer_inodo(p_inodo1,&inodo);
     inodo.nlinks++;
-    inodo.ctime == time(NULL);
+    inodo.ctime = time(NULL);
     escribir_inodo(p_inodo1,inodo);
     return 0;  
 }
@@ -268,7 +268,16 @@ int mi_unlink(const char *camino){
                 mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));//qUIZA ES Pinodo
             } else {
                 struct entrada entrada;
-                //mi_read_f(p_inodo_dir);
+                mi_read_f(p_inodo_dir,&entrada,nentradas * sizeof(struct entrada),sizeof(struct entrada));
+                mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));
+            }
+            leer_inodo(p_inodo,&inodo);
+            inodo.nlinks--;
+            if(inodo.nlinks>0){
+                inodo.ctime = time(NULL);
+                escribir_inodo(p_inodo,inodo);
+            } else {
+                liberar_inodo(p_inodo);
             }
         }
     }
