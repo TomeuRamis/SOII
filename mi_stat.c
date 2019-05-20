@@ -26,6 +26,6 @@ int main(int argc, char **argv){
         
         bumount();
     } else {
-        printf("Sintaxi: ./mi_stat <disco> </ruta>");
+        printf("Sintaxi: ./mi_stat <disco> </ruta>\n");
     }
 }

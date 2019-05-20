@@ -13,6 +13,6 @@ int main(int argc, char **argv){
         }
         bumount();
     } else {
-        printf("Sintaxis: ./mi_mkdir <disco> <permisos> </ruta>");
+        printf("Sintaxis: ./mi_mkdir <disco> <permisos> </ruta>\n");
     }
 }

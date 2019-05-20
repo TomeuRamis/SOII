@@ -45,6 +45,6 @@ int main(int argc, char **argv){
         }
 
     } else {
-        printf("Sintaxi: ./mi_cat <disco> </ruta_fichero>");
+        printf("Sintaxi: ./mi_cat <disco> </ruta_fichero>\n");
     }
 }

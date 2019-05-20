@@ -32,6 +32,6 @@ int main(int argc, char **argv){
         }
         bumount();
     } else {
-        printf("Sintaxis: ./mi_link disco </ruta_fichero_original> </ruta_enlace>");
+        printf("Sintaxis: ./mi_link disco </ruta_fichero_original> </ruta_enlace>\n");
     }
 }

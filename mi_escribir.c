@@ -23,6 +23,7 @@ int main(int argc, char **argv){
             memcpy(buffer, texto, strlen(texto));  
             int offset = atoi(argv[4]);  
             unsigned int nbytes=strlen(texto);
+            printf("Longitud texto: %d",nbytes);
             int bytes_escritos = mi_write(camino,&buffer,offset,nbytes); //Escribimos el texto
             int bloques_escritos= (bytes_escritos/BLOCKSIZE);
             if (bytes_escritos % BLOCKSIZE){    //Calculamos si se necesita un bloque extra
@@ -33,6 +34,6 @@ int main(int argc, char **argv){
             bumount();
         }
     } else {
-        printf("Sintaxi: ./mi_write <disco> </ruta_fichero> <texto> <offset>");
+        printf("Sintaxi: ./mi_write <disco> </ruta_fichero> <texto> <offset>\n");
     }
 }

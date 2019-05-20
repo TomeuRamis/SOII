@@ -57,7 +57,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     if(num_entradas>0){
         mi_read_f(*p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
             nentrada++;
-        while( (nentrada < num_entradas)&&(strcmp(inicial, entrada.nombre) != 0)) {
+        while((nentrada < num_entradas)&&(strcmp(inicial, entrada.nombre) != 0)) {
             //printf("El de abajo miente\n");
             mi_read_f(*p_inodo_dir, &entrada, nentrada*sizeof(struct  entrada), sizeof(struct entrada));
             nentrada++;
@@ -108,7 +108,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
         }
  
     }
-    leer_inodo(entrada.ninodo, &inodo);
+    //leer_inodo(entrada.ninodo, &inodo);
     if( (inodo.tipo == 'd' && strcmp(final, "/") == 0)||(inodo.tipo =='f' && strcmp(final, "\0")==0)){
         if ((nentrada < num_entradas)&&(reservar=1)) {
             printf("Error entrada ya exsistente\n");
@@ -148,9 +148,10 @@ int mi_dir(const char *camino, char *buffer){
             nentradas = (inodo.tamEnBytesLog/sizeof(struct entrada));
         }
         for(int i = 0; i < nentradas; i++){
-            leidos = mi_read_f(p_inodo, &entrada, i*sizeof(struct  entrada), sizeof(struct entrada)); //Possible error por los size of entrada
+            leidos = mi_read_f(p_inodo, &entrada, i*sizeof(struct  entrada), sizeof(entrada.nombre)); //Possible error por los size of entrada
             strcat(buffer,entrada.nombre);
             strcat(buffer," | ");
+            leidos += 3;
         }
         strcat(buffer,"\n");
         return leidos;

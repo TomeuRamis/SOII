@@ -10,6 +10,6 @@ int main(int argc, char **argv){
         }
         bumount();
     } else {
-        printf("Sintaxi: ./mi_chmod <disco> <permisos> </ruta>");
+        printf("Sintaxi: ./mi_chmod <disco> <permisos> </ruta>\n");
     }
 }
