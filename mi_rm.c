@@ -5,7 +5,7 @@ int main(int argc, char **argv){
         bmount(argv[1]);
         bread(0, &SB);
         char *camino = argv[2];
-        if (camino == "/"){
+        if (strcmp(camino,"/")!=0){
             mi_unlink(argv[2]); 
         } else {
             printf("No se puede borrar el directorio raiz");
