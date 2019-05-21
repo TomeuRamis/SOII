@@ -253,22 +253,28 @@ int mi_unlink(const char *camino){
     unsigned int p_entrada =0;
     unsigned int p_inodo_dir =0;
     struct inodo inodo;
-    unsigned char *camino_aux=camino;
+    char *camino_aux=(char *)camino;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
+        leer_inodo(p_inodo, &inodo);
+        if(inodo.tipo == 'd' && inodo.tamEnBytesLog <= 0){
+            printf("Error: El directorio no está vacío");
+            return -1;
+        }
         leer_inodo(p_inodo_dir,&inodo);
         int cont =0;
         while (cont <strlen(camino)-1){
             camino_aux++;
             cont ++;
         }
-        if ((*camino_aux=='/')&&(inodo.tamEnBytesLog>0)){
+        if (((*camino_aux=='/')&&(inodo.tamEnBytesLog>0))||(*camino_aux=='\0')){
             int nentradas = inodo.tamEnBytesLog/sizeof(struct entrada);
             if(p_entrada == nentradas - 1){
                 mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));//qUIZA ES Pinodo
             } else {
                 struct entrada entrada;
-                mi_read_f(p_inodo_dir,&entrada,nentradas * sizeof(struct entrada),sizeof(struct entrada));
+                mi_read_f(p_inodo_dir,&entrada,nentradas * sizeof(struct entrada),sizeof(struct entrada));    
+                mi_write_f(p_inodo_dir, &entrada, p_entrada*sizeof(struct entrada), sizeof(struct entrada) );
                 mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));
             }
             leer_inodo(p_inodo,&inodo);
@@ -277,8 +283,13 @@ int mi_unlink(const char *camino){
                 inodo.ctime = time(NULL);
                 escribir_inodo(p_inodo,inodo);
             } else {
+                if(inodo.tamEnBytesLog==0){
                 liberar_inodo(p_inodo);
+                } else {
+                    printf("Error: El directorio no está vacío");
+                }
             }
         }
     }
+    return 0;
 }
