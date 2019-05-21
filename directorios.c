@@ -110,7 +110,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     }
     leer_inodo(entrada.ninodo, &inodo);
     if( (inodo.tipo == 'd' && strcmp(final, "/") == 0)||(inodo.tipo =='f' && strcmp(final, "\0")==0)){
-        if ((nentrada < num_entradas)&&(reservar=1)) {
+        if ((nentrada < num_entradas)&&(reservar==1)) {
             printf("Error entrada ya exsistente\n");
             return -8; //Error entrada ya exsistente
         }
@@ -174,7 +174,8 @@ int mi_stat(const char *camino, struct STAT *p_stat){
     unsigned int p_entrada;
     unsigned int p_inodo_dir =0;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
-    if (error ==1) {
+    if (error ==1 || error == 0) {
+        printf("Número del inodo: %d\n",p_inodo);
         mi_stat_f(p_inodo,p_stat);
         return 0;
     }
@@ -257,7 +258,7 @@ int mi_unlink(const char *camino){
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
         leer_inodo(p_inodo, &inodo);
-        if(inodo.tipo == 'd' && inodo.tamEnBytesLog <= 0){
+        if(inodo.tipo == 'd' && inodo.tamEnBytesLog > 0){
             printf("Error: El directorio no está vacío");
             return -1;
         }
@@ -267,15 +268,16 @@ int mi_unlink(const char *camino){
             camino_aux++;
             cont ++;
         }
-        if (((*camino_aux=='/')&&(inodo.tamEnBytesLog>0))||(*camino_aux=='\0')){
+        if (((*camino_aux=='/')&&(inodo.tamEnBytesLog>0))||((*camino_aux!='/')&&(inodo.tamEnBytesLog>0))){
             int nentradas = inodo.tamEnBytesLog/sizeof(struct entrada);
-            if(p_entrada == nentradas - 1){
+            if(p_entrada == nentradas){
                 mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));//qUIZA ES Pinodo
             } else {
                 struct entrada entrada;
-                mi_read_f(p_inodo_dir,&entrada,nentradas * sizeof(struct entrada),sizeof(struct entrada));    
-                mi_write_f(p_inodo_dir, &entrada, p_entrada*sizeof(struct entrada), sizeof(struct entrada) );
+                mi_read_f(p_inodo_dir,&entrada,(nentradas-1) * sizeof(struct entrada),sizeof(struct entrada));    
+                mi_write_f(p_inodo_dir, &entrada, (p_entrada-1)*sizeof(struct entrada), sizeof(struct entrada) );
                 mi_truncar_f(p_inodo_dir,inodo.tamEnBytesLog-sizeof(struct entrada));
+                
             }
             leer_inodo(p_inodo,&inodo);
             inodo.nlinks--;
@@ -283,11 +285,9 @@ int mi_unlink(const char *camino){
                 inodo.ctime = time(NULL);
                 escribir_inodo(p_inodo,inodo);
             } else {
-                if(inodo.tamEnBytesLog==0){
-                liberar_inodo(p_inodo);
-                } else {
-                    printf("Error: El directorio no está vacío");
-                }
+
+                liberar_inodo(p_inodo);    
+                
             }
         }
     }

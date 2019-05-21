@@ -28,3 +28,10 @@
 ################################################################################
 ./mi_link disco /dir1/dir11/fic3 /dir2/dir21/fic2 #camino2 NO ha de existir
 
+./mi_mkdir disco 6 /d1/
+# creamos 17 subdirectorios sd0, sd1..., sd16 en d1
+for i in $(seq 0 16)
+do
+./mi_mkdir disco 6 /d1/sd$i/
+done
+

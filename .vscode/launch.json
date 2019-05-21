@@ -10,12 +10,12 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/mi_rm",
-            "args": ["disco","/dir2/dir21/"],
+            "program": "${workspaceFolder}/mi_stat",
+            "args": ["disco","/"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
