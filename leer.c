@@ -23,6 +23,12 @@ int main(int argc, char **argv){
         memset(buffer_texto,0,TAMLEC);          //Inicializamos el buffer con 0s
         leido_aux = mi_read_f(ninodo, buffer_texto, offset, TAMLEC); //Guardamos los bytes leeidos en leido_aux
         leer_inodo(ninodo, &inodo);
+        if (leido_aux == 0){
+            fprintf(stderr, "\nBytes leidos = %d\n",leidos);
+            leer_inodo(ninodo,&inodo);
+            fprintf(stderr, "TamEnBytesLog=%d\n",inodo.tamEnBytesLog);
+            return -1;
+        }
         while(offset < inodo.tamEnBytesLog){ 
             write(fd, buffer_texto, leido_aux);     //Escribimos por pantalla o en el fichero lo que acabamos de leer
             leidos += leido_aux;                    //Actualizamos los bytes leidos totales

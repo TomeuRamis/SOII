@@ -40,7 +40,7 @@ int main(int argc, char **argv){
             write(1, buffer_texto, leido_aux);   
             fprintf(stderr, "\nBytes leidos = %d\n",leidos);
             leer_inodo(ninodo,&inodo);
-            fprintf(stderr, "TamEnBytesLog=%d\n",inodo.tamEnBytesLog);
+            //fprintf(stderr, "TamEnBytesLog=%d\n",inodo.tamEnBytesLog);
             bumount();
         }
 

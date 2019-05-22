@@ -12,25 +12,25 @@ int main(int argc, char **argv){
             cont ++;
         }
         if(*camino_aux=='/'){
-            printf("La ruta no es un fichero");
+            printf("ERROR: La ruta no es un fichero\n");
             return 0;
         }else{
             bmount(argv[1]);
             bread(0, &SB);
             char *texto= argv[3];
-            printf("Longitud texto: %ld\n\n", strlen(texto));
+            printf("Longitud texto: %ld\n", strlen(texto));
             unsigned char buffer[strlen(texto)];
             memcpy(buffer, texto, strlen(texto));  
             int offset = atoi(argv[4]);  
             unsigned int nbytes=strlen(texto);
-            printf("Longitud texto: %d",nbytes);
+            //printf("Longitud texto: %d",nbytes);
             int bytes_escritos = mi_write(camino,&buffer,offset,nbytes); //Escribimos el texto
             int bloques_escritos= (bytes_escritos/BLOCKSIZE);
             if (bytes_escritos % BLOCKSIZE){    //Calculamos si se necesita un bloque extra
                 bloques_escritos++;
             }
             //Prints dels STAT del inodo despues de escribir el texto
-            printf("Bytes escritos: %d\n\n",bytes_escritos);
+            printf("Bytes escritos: %d\n",bytes_escritos);
             bumount();
         }
     } else {

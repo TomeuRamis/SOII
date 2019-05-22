@@ -74,7 +74,7 @@ int mi_read_f(unsigned int ninodo, void *buf_original, unsigned int offset, unsi
 
         //printf("Offset: %d\n", offset);
         if (offset>= inodo.tamEnBytesLog){  //El offset se sale del tamaño del inodo
-            fprintf(stderr,"El offset se sale del tamaño del inodo\n");      
+            //fprintf(stderr,"El offset se sale del tamaño del inodo\n");      
             return leidos;
         }
         if (offset+nbytes >= inodo.tamEnBytesLog){  //Acortamos la longitud a escribir para que quepa en el inodo.
@@ -153,11 +153,13 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
 }
 
 int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
+    mi_waitSem();
     struct inodo inodo;
     leer_inodo(ninodo, &inodo);
     inodo.permisos=permisos;
     inodo.ctime=time(NULL);
     escribir_inodo(ninodo,inodo);
+    mi_signalSem();
     return 0;
 }
 

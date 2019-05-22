@@ -8,6 +8,8 @@
 
 #define BLOCKSIZE 1024 // bytes
 
+void mi_waitSem();
+void mi_signalSem();
 int bmount(const char *camino);
 int bumount();
 int bwrite(unsigned int nbloque, const void *buf);

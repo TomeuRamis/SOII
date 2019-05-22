@@ -26,8 +26,6 @@ echo "######################################################################"
 echo "$ ./mi_escribir  disco /fichero "estoy estupendamente" 256000"
 ./mi_escribir  disco /fichero "estoy estupendamente" 256000
 echo "######################################################################"
-
-echo "######################################################################"
 echo "$ ./mi_mkdir disco 6 /dir1/"
 ./mi_mkdir disco 6 /dir1/
 echo "$ ./mi_touch disco 6 /dir1/fic1"

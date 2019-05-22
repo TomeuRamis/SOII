@@ -3,6 +3,8 @@
         "bloques.h": "c",
         "ficheros.h": "c",
         "directorios.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "stdlib.h": "c",
+        "string.h": "c"
     }
 }

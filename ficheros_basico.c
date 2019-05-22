@@ -354,7 +354,7 @@ int liberar_bloques_inodo(unsigned int ninodo, unsigned int nblogico){
             nRangoBL = obtener_nrangoBL(inodo,nblog,&ptr);
             if(ptr!=0){         //El bloque logico no está vacio (optimización)
                 if (nRangoBL<0){
-                    fprintf(stderr, "Error al liberar el bloque de inodos");
+                    fprintf(stderr, "Error al liberar el bloque de inodos\n");
                     return -1;
                 }
                 nivel_punteros=nRangoBL;          
@@ -403,7 +403,7 @@ int liberar_bloques_inodo(unsigned int ninodo, unsigned int nblogico){
             }
         }
     }
-    fprintf(stdout, "Numero de bloques liberados: %d\n", liberados);
+    //fprintf(stdout, "Numero de bloques liberados: %d\n", liberados);
     if (salvar_inodo==1){
         escribir_inodo(ninodo,inodo);
     }
