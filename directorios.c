@@ -142,7 +142,7 @@ int mi_dir(const char *camino, char *buffer){
     unsigned int p_entrada;
     struct inodo inodo;
     struct entrada entrada;
-    int nentradas;
+    int nentradas = 0;
     int leidos = 0;
     int total = 0;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
