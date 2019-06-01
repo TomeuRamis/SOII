@@ -8,7 +8,7 @@ int main(int argc, char **argv){
         if (strcmp(camino,"/")!=0){
             mi_unlink(argv[2]); 
         } else {
-            printf("No se puede borrar el directorio raiz");
+            printf("ERROR: No se puede borrar el directorio raiz\n");
         }
         bumount();
     } else {

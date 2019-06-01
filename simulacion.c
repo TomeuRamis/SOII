@@ -21,7 +21,7 @@ int main (int argc, char **argv){
       memset(camino, 0, 100);
       time_t now = time (0);
       strftime (camino, 100, "/simul_%Y%m%d%H%M%S/", localtime (&now));
-      printf ("%s\n", camino);
+      printf ("Directorio: %s\n", camino);
 
       mi_creat(camino,6);
 
@@ -39,11 +39,13 @@ int main (int argc, char **argv){
           strcat(camino_aux, spid);
           strcat(camino_aux, "/");
           mi_creat(camino_aux, 6);
-          printf("%s\n",camino_aux);
-          
+          printf("Proceso %d: Creado directorio %s\n", i, camino_aux);          
           char *fichero = "prueba.dat";
           strcat(camino_aux, fichero);
-          mi_creat(camino_aux,7);
+          int er = mi_creat(camino_aux,7);
+          if(er == 1){
+            printf("proceso %d: creado archivo.dat chacho %s\n", i, camino_aux);
+          }
           srand(time(NULL)+getpid());
           for(int j = 0; j < 50; j++){
             struct REGISTRO reg;
@@ -51,9 +53,16 @@ int main (int argc, char **argv){
             reg.pid=getpid();
             reg.nEscritura=j+1;
             reg.nRegistro=rand()%REGMAX;
-            mi_write(camino_aux, &reg, reg.nRegistro*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
+            
+            int erroro = mi_write(camino_aux, &reg, reg.nRegistro*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
+            
+            if (erroro != 1){
+              printf("Proceso %d: error %d\n", i, erroro);
+              printf("Proceso %d: camino escrito: %s\n", i, camino_aux);
+            }
             sleep(0.05);
           }
+          printf("Proceso %d: Completadas las 50 escrituras en %s\n", i, camino_aux);  
           bumount();
           exit(0);
         }

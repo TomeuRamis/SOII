@@ -3,7 +3,7 @@
 int extraer_camino(const char *camino, char *inicial, char *final){
     char *prinpal= malloc(sizeof(strlen(camino)));
     prinpal = strchr(camino,'/');
-    if (!strcmp(prinpal,"/")){
+    if (!strcmp(&camino[0],"/")){
         printf("ERROR: Los caminos deben empezar por / \n");
         return -1;
     }
@@ -17,7 +17,8 @@ int extraer_camino(const char *camino, char *inicial, char *final){
         return 0; //tipo f
     }
     int cont = camino_aux-prinpal;                                 // EXtremadamente cutre
-    strncpy(inicial,prinpal,cont);
+    strcpy(inicial,prinpal);
+    inicial[cont] = '\0';
     strcpy(final,camino_aux);
     return 1; // tipo d
 }
@@ -66,7 +67,8 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
     if (nentrada==num_entradas && strcmp(inicial, entrada.nombre) != 0) {
         switch (reservar) {
             case 0:
-                printf("Error no exsiste entrada consulta\n");
+                printf("Error no exsiste entrada consulta \ninical: %s \nentrada.nombre: %s \n", inicial, entrada.nombre);
+                
                 return ERROR_NO_EXSISTE_ENTRADA_CONSULTADA; //Error no exsiste entrada consulta
             case 1: //modo escritura
             if (inodo.tipo=='f'){
@@ -215,16 +217,18 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
     unsigned int p_inodo;
     unsigned int p_entrada;
     unsigned int p_inodo_dir =0;
+    
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
         //printf("Llego a: inicio lectura");
         int bytesleidos= mi_write_f(p_inodo,buf,offset,nbytes);
         mi_signalSem();
-        return bytesleidos;
+        //return bytesleidos; TEMPORAAAAAAAAAAAAAAAL
+        return error;
     } else {
         //printf("NO se ha encontrado entrada");
         mi_signalSem();
-        return -1;
+        return error;
     }
 }
 

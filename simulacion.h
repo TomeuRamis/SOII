@@ -2,8 +2,8 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#define REGMAX 500000
-#define NUMPROCESOS 2
+#define REGMAX 50000
+#define NUMPROCESOS 10
 
 struct REGISTRO {
     time_t fecha; //fecha de la escritura en formato epoch 
