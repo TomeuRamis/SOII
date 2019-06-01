@@ -18,14 +18,19 @@ void mi_signalSem() {
 
 static int descriptor = 0;
 
-
-
 // Mount the file descriptor
 int bmount(const char *camino){
-    mutex = initSem();
-    descriptor = open(camino, O_RDWR|O_CREAT, 0666);
-    if (descriptor == -1){
-        return -1;
+    if(descriptor>0){
+        close(descriptor);
+    }
+    if((descriptor=open(camino, O_RDWR | O_CREAT, 0666))==-1){
+        fprintf(stderr, "Error: bloques.c -> bmount -> open()\n");
+    }
+    if(!mutex){
+      mutex = initSem();
+      if(mutex==SEM_FAILED){
+          return -1;
+      }  
     }
     return descriptor;
 }
@@ -33,10 +38,12 @@ int bmount(const char *camino){
 // Unmount the file descriptor
 int bumount(){ 
     descriptor =  close(descriptor);
-    deleteSem();
+    
     if (descriptor ==-1){
+        fprintf(stderr, "Error: bloques.c -> bunmount -> close() %d: %s\n", errno, strerror(errno));
         return -1;
     }
+    deleteSem();
     return 0;
 }
 
