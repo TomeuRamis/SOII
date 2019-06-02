@@ -16,7 +16,7 @@ int extraer_camino(const char *camino, char *inicial, char *final){
         strcpy(final,"");
         return 0; //tipo f
     }
-    int cont = camino_aux-prinpal;                                 // EXtremadamente cutre
+    int cont = camino_aux-prinpal;                                 
     strcpy(inicial,prinpal);
     inicial[cont] = '\0';
     strcpy(final,camino_aux);

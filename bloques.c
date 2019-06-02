@@ -47,6 +47,7 @@ int bumount(){
     return 0;
 }
 
+
 //Write the content of buf on the block number nbloques of the file
 int bwrite(unsigned int nbloque, const void *buf){
     size_t nbytes;

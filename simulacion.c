@@ -13,6 +13,7 @@ void reaper(){
   }
 }
 
+
 int main (int argc, char **argv){
     if (argc == 2){
       bmount(argv[1]);
@@ -27,11 +28,11 @@ int main (int argc, char **argv){
 
       signal(SIGCHLD, reaper);
       for(int i = 1; i <= NUMPROCESOS; i++){
-        int pid = fork();
-        char camino_aux[100];
-        memset(camino_aux, 0, 100);
-        strcat(camino_aux, camino);
+        int pid = fork();  
         if(pid > 0){ //Es el hijo
+          char camino_aux[100];
+          memset(camino_aux, 0, 100);
+          strcat(camino_aux, camino);
           bmount(argv[1]);
           strcat(camino_aux, "proceso_");
           char spid[10];
@@ -39,34 +40,33 @@ int main (int argc, char **argv){
           strcat(camino_aux, spid);
           strcat(camino_aux, "/");
           mi_creat(camino_aux, 6);
-          printf("Proceso %d: Creado directorio %s\n", i, camino_aux);          
+          //printf("Proceso %d: Creado directorio %s\n", i, camino_aux);          
           char *fichero = "prueba.dat";
           strcat(camino_aux, fichero);
           int er = mi_creat(camino_aux,7);
           if(er == 1){
-            printf("proceso %d: creado archivo.dat chacho %s\n", i, camino_aux);
+            //printf("proceso %d: creado archivo .dat correctamente %s\n", i, camino_aux);
           }
-          srand(time(NULL)+getpid());
+          srand(time(NULL)+getpid());  
           for(int j = 0; j < 50; j++){
             struct REGISTRO reg;
             reg.fecha=time(NULL);
             reg.pid=getpid();
             reg.nEscritura=j+1;
             reg.nRegistro=rand()%REGMAX;
-            
+            //printf("proceso %d: valor de rand: %d\n", i, reg.nRegistro );
             int erroro = mi_write(camino_aux, &reg, reg.nRegistro*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
-            
             if (erroro != 1){
               printf("Proceso %d: error %d\n", i, erroro);
               printf("Proceso %d: camino escrito: %s\n", i, camino_aux);
             }
-            sleep(0.05);
+            usleep(5000);
           }
           printf("Proceso %d: Completadas las 50 escrituras en %s\n", i, camino_aux);  
           bumount();
           exit(0);
         }
-        sleep(0.2);
+        usleep(200000);
       }
       while(acabados< NUMPROCESOS){
         pause();
