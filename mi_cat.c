@@ -21,7 +21,7 @@ int main(int argc, char **argv){
             int leidos = 0;
             int leido_aux = 0;
             unsigned int offset = 0;
-            struct inodo inodo;
+            //struct inodo inodo;
             int ninodo;
             unsigned char buffer_texto[tambuffer];
             char *camino=argv[2];
@@ -29,17 +29,17 @@ int main(int argc, char **argv){
             bmount(argv[1]);
             bread(0, &SB);  
             memset(buffer_texto,0,tambuffer);          //Inicializamos el buffer con 0s
-            leido_aux = mi_read(camino, &buffer_texto, offset, tambuffer, &ninodo); //Guardamos los bytes leeidos en leido_aux
-            leer_inodo(ninodo, &inodo);
-            while(offset < inodo.tamEnBytesLog){ 
+            leido_aux = mi_read(camino, &buffer_texto, offset, tambuffer); //Guardamos los bytes leeidos en leido_aux
+            //leer_inodo(ninodo, &inodo);
+            while(0 < leido_aux){ 
                 write(1, buffer_texto, leido_aux);     //Escribimos por pantalla o en el fichero lo que acabamos de leer
                 leidos += leido_aux;                    //Actualizamos los bytes leidos totales
                 offset += leido_aux;  
-                leido_aux = mi_read(camino, buffer_texto, offset, tambuffer, &ninodo);
+                leido_aux = mi_read(camino, buffer_texto, offset, tambuffer);
             }
             write(1, buffer_texto, leido_aux);   
             fprintf(stderr, "\nBytes leidos = %d\n",leidos);
-            leer_inodo(ninodo,&inodo);
+            //leer_inodo(ninodo,&inodo);
             //fprintf(stderr, "TamEnBytesLog=%d\n",inodo.tamEnBytesLog);
             bumount();
         }

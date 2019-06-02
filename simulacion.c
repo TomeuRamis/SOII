@@ -36,7 +36,7 @@ int main (int argc, char **argv){
           bmount(argv[1]);
           strcat(camino_aux, "proceso_");
           char spid[10];
-          sprintf(spid, "%d", pid);
+          sprintf(spid, "%d", getpid());
           strcat(camino_aux, spid);
           strcat(camino_aux, "/");
           mi_creat(camino_aux, 6);       
@@ -46,6 +46,8 @@ int main (int argc, char **argv){
           if(er != 1){
             bumount();
             exit(0);
+          } else{
+            // printf("Proceso %d: la creacion del archivo es correcta\n", i);
           }
           srand(time(NULL)+getpid());  
           for(int j = 0; j < 50; j++){

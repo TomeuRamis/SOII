@@ -3,7 +3,7 @@
 int extraer_camino(const char *camino, char *inicial, char *final){
     char *prinpal= malloc(sizeof(strlen(camino)));
     prinpal = strchr(camino,'/');
-    if (!strcmp(&camino[0],"/")){
+    if (*camino!='/'){
         printf("ERROR: Los caminos deben empezar por / \n");
         return -1;
     }
@@ -193,13 +193,12 @@ int mi_stat(const char *camino, struct STAT *p_stat){
     return -1;
 }
 
-int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nbytes, int *ninodo){
+int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nbytes){
     mi_waitSem();
     unsigned int p_inodo = 0;
     unsigned int p_entrada =0;
     unsigned int p_inodo_dir =0;
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
-    *ninodo = p_inodo;
     if (error ==1){
         //printf("Llego a: inicio lectura");
         int bytesleidos= mi_read_f(p_inodo,buf,offset,nbytes);

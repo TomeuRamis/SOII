@@ -28,7 +28,7 @@ int mi_chmod(const char *camino, unsigned char permisos);
 int mi_stat(const char *camino, struct STAT *p_stat);
 
 //nivel 10
-int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nbytes, int *ninodo);
+int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nbytes);
 int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned int nbytes);
 
 //nivel 11
