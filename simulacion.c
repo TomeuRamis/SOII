@@ -29,7 +29,7 @@ int main (int argc, char **argv){
       signal(SIGCHLD, reaper);
       for(int i = 1; i <= NUMPROCESOS; i++){
         int pid = fork();  
-        if(pid > 0){ //Es el hijo
+        if(pid == 0){ //Es el hijo
           char camino_aux[100];
           memset(camino_aux, 0, 100);
           strcat(camino_aux, camino);
@@ -39,13 +39,13 @@ int main (int argc, char **argv){
           sprintf(spid, "%d", pid);
           strcat(camino_aux, spid);
           strcat(camino_aux, "/");
-          mi_creat(camino_aux, 6);
-          //printf("Proceso %d: Creado directorio %s\n", i, camino_aux);          
+          mi_creat(camino_aux, 6);       
           char *fichero = "prueba.dat";
           strcat(camino_aux, fichero);
           int er = mi_creat(camino_aux,7);
-          if(er == 1){
-            //printf("proceso %d: creado archivo .dat correctamente %s\n", i, camino_aux);
+          if(er != 1){
+            bumount();
+            exit(0);
           }
           srand(time(NULL)+getpid());  
           for(int j = 0; j < 50; j++){
@@ -56,11 +56,10 @@ int main (int argc, char **argv){
             reg.nRegistro=rand()%REGMAX;
             //printf("proceso %d: valor de rand: %d\n", i, reg.nRegistro );
             int erroro = mi_write(camino_aux, &reg, reg.nRegistro*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
-            if (erroro != 1){
-              printf("Proceso %d: error %d\n", i, erroro);
-              printf("Proceso %d: camino escrito: %s\n", i, camino_aux);
+            if (erroro  < 0){
+              printf("Proceso %d: Error de escritura\n", i);
             }
-            usleep(5000);
+            usleep(50000);
           }
           printf("Proceso %d: Completadas las 50 escrituras en %s\n", i, camino_aux);  
           bumount();

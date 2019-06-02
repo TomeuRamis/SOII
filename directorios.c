@@ -221,10 +221,9 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
         //printf("Llego a: inicio lectura");
-        int bytesleidos= mi_write_f(p_inodo,buf,offset,nbytes);
+        int bytesescritos= mi_write_f(p_inodo,buf,offset,nbytes);
         mi_signalSem();
-        //return bytesleidos; TEMPORAAAAAAAAAAAAAAAL
-        return error;
+        return bytesescritos; 
     } else {
         //printf("NO se ha encontrado entrada");
         mi_signalSem();
