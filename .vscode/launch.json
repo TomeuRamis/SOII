@@ -11,7 +11,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/verificacion",
-            "args": ["disco","/simul_20190603193042/"],
+            "args": ["disco","/simul_20190603203121/"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],

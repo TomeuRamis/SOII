@@ -62,7 +62,7 @@ int main (int argc, char **argv){
             reg.nEscritura=j+1;
             reg.nRegistro=rand()%REGMAX;
             //printf("proceso %d: valor de rand: %d\n", i, reg.nRegistro );
-            int erroro = mi_write(final, &reg, reg.nRegistro*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
+            int erroro = mi_write(final, &reg, /*reg.nRegistro*/j*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
             if (erroro  < 0){
               printf("Proceso %d: Error de escritura\n", i);
             }

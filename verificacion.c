@@ -64,7 +64,7 @@ int main(int argc, char **argv){
             }
             info.nEscrituras=escrituras_validadas;
             printf("%d) %d escrituras validadas en %s", i, escrituras_validadas, camino_prueba);
-            char *aux = malloc(100000000000);
+            char *aux = malloc(sizeof(char));
             sprintf(aux, "\nPID: %d\nNumero escrituras: %d\nPrimera escritura\t%d\t%d %s\nUltima escritura\t%d\t%d %d\nMenor escritura\t%d\t%d %d\nMayor escritura\t%d\t%d %d\n",
             info.pid,info.nEscrituras,info.PrimeraEscritura.nEscritura, info.PrimeraEscritura.nRegistro,asctime(localtime(&info.PrimeraEscritura.fecha)), 
             info.UltimaEscritura.nEscritura, info.UltimaEscritura.nRegistro, asctime(localtime(&info.UltimaEscritura.fecha)), info.MenorPosicion.nEscritura, 
