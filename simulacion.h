@@ -3,7 +3,7 @@
 #include <signal.h>
 
 #define REGMAX 500000
-#define NUMPROCESOS 50
+#define NUMPROCESOS 100
 
 struct REGISTRO {
     time_t fecha; //fecha de la escritura en formato epoch 

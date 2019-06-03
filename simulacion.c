@@ -61,13 +61,13 @@ int main (int argc, char **argv){
             if (erroro  < 0){
               printf("Proceso %d: Error de escritura\n", i);
             }
-            usleep(50000);
+            sleep(0.05);
           }
           printf("Proceso %d: Completadas las 50 escrituras en %s\n", i, camino_aux);  
           bumount();
           exit(0);
         }
-        usleep(200000);
+        sleep(0.2);
       }
       while(acabados< NUMPROCESOS){
         pause();

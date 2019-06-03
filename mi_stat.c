@@ -21,7 +21,7 @@ int main(int argc, char **argv){
         strftime(ctime, sizeof(ctime), "%a %Y-%m-%d %H:%M:%S", ts);
         printf("ATIME: %s\nMTIME: %s\nCTIME: %s\n",atime,mtime,ctime); 
         printf("nlinks=%d\n",stat ->nlinks);
-        printf("tamEnBytesLong=%d\n", stat ->tamEnBytesLog);
+        printf("tamEnBytesLog=%d\n", stat ->tamEnBytesLog);
         printf("numBloquesOcupados=%d\n",stat ->numBloquesOcupados);
         
         bumount();
