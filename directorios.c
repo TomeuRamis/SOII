@@ -84,6 +84,7 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
                 if (tipo==1){ //tipo es directorio
                     if ((strcmp(final,"/")==0)){
                         entrada.ninodo = reservar_inodo('d', permisos);
+                        //printf("Inodo reservado: %d\n", entrada.ninodo);
                         leer_inodo(entrada.ninodo,&inodo);
                         //printf("[buscar_entrada()→ entrada.nombre: %s, entrada.ninodo: %d]\n",entrada.nombre,entrada.ninodo);
                         //printf("[buscar_entrada()→ reservado inodo %d tipo %c con permisos %d]\n",entrada.ninodo,inodo.tipo,inodo.permisos);
@@ -108,7 +109,6 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
             }
             break;
         }
- 
     }
     leer_inodo(entrada.ninodo, &inodo);
     if( (inodo.tipo == 'd' && strcmp(final, "/") == 0)||(inodo.tipo =='f' && strcmp(final, "\0")==0)){
@@ -127,18 +127,19 @@ unsigned int *p_inodo, unsigned int *p_entrada, char reservar, unsigned char per
 }
 
 int mi_creat(const char *camino, unsigned char permisos){
-    mi_waitSem();
+    
     //printf("Llego a:mi creat\n");
     unsigned int p_entrada = 0;
     unsigned int p_inodo_dir = 0;
     unsigned int p_inodo = 0; 
+    mi_waitSem();
     int ent = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,1,permisos);//Suponemos actualizacion de p_entrada
     mi_signalSem();
     return ent;
 }
 
 int mi_dir(const char *camino, char *buffer){
-    mi_waitSem();
+    
     unsigned int p_inodo;
     unsigned int p_inodo_dir =0;
     unsigned int p_entrada;
@@ -147,7 +148,8 @@ int mi_dir(const char *camino, char *buffer){
     int nentradas = 0;
     int leidos = 0;
     int total = 0;
-    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
+    mi_waitSem();
+    int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);  
     if (error >= 0) {
         leer_inodo(p_inodo,&inodo);
         if (inodo.tipo=='d' && (inodo.permisos&4)==4){
@@ -159,8 +161,8 @@ int mi_dir(const char *camino, char *buffer){
             strcat(buffer," | ");
             total = total + 1;
         }
-        strcat(buffer,"\n");
         mi_signalSem();
+        strcat(buffer,"\n"); 
         printf("Total: %d\n", total);
         return leidos;
     }
@@ -194,10 +196,11 @@ int mi_stat(const char *camino, struct STAT *p_stat){
 }
 
 int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nbytes){
-    mi_waitSem();
+   
     unsigned int p_inodo = 0;
     unsigned int p_entrada =0;
     unsigned int p_inodo_dir =0;
+    mi_waitSem();
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
         //printf("Llego a: inicio lectura");
@@ -212,11 +215,11 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
 }
 
 int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned int nbytes){
-    mi_waitSem();
+    
     unsigned int p_inodo;
     unsigned int p_entrada;
     unsigned int p_inodo_dir =0;
-    
+    mi_waitSem();
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
         //printf("Llego a: inicio lectura");
@@ -231,8 +234,6 @@ int mi_write(const char *camino, const void *buf, unsigned int offset, unsigned 
 }
 
 int mi_link(const char *camino1, const char *camino2){
-
-    mi_waitSem();
     unsigned int p_inodo1 = 0;
     unsigned int p_entrada1 =0;
     unsigned int p_inodo_dir1 =0;
@@ -242,6 +243,7 @@ int mi_link(const char *camino1, const char *camino2){
     unsigned int p_inodo_dir2 =0;
     struct inodo inodo;
     struct entrada entrada;
+    mi_waitSem();
     int error = buscar_entrada(camino1,&p_inodo_dir1,&p_inodo1,&p_entrada1,0,4);
     leer_inodo(p_inodo1,&inodo); 
     if (error!=1){
@@ -272,12 +274,13 @@ int mi_link(const char *camino1, const char *camino2){
 }
 
 int mi_unlink(const char *camino){
-    mi_signalSem();
+    
     unsigned int p_inodo = 0;
     unsigned int p_entrada =0;
     unsigned int p_inodo_dir =0;
     struct inodo inodo;
     char *camino_aux=(char *)camino;
+    mi_signalSem();
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
         leer_inodo(p_inodo, &inodo);

@@ -3,7 +3,6 @@
 int main(int argc, char **argv){
     if (argc == 4){
         bmount(argv[1]);
-            bread(0, &SB);
         
         char *camino1 = argv[2];
         char *camino2 = argv[3];

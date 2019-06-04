@@ -29,6 +29,7 @@ int bmount(const char *camino){
     if(!mutex){
       mutex = initSem();
       if(mutex==SEM_FAILED){
+
           return -1;
       }  
     }

@@ -1,5 +1,5 @@
 #include "simulacion.h"
-
+#define TAM_BIG_BUF 10000
 struct INFORMACION {
     int pid; 
     unsigned int nEscrituras; // validadas 

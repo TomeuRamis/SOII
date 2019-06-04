@@ -153,8 +153,8 @@ int mi_stat_f(unsigned int ninodo, struct STAT *p_stat){
 }
 
 int mi_chmod_f(unsigned int ninodo, unsigned char permisos){
-    mi_waitSem();
     struct inodo inodo;
+    mi_waitSem();
     leer_inodo(ninodo, &inodo);
     inodo.permisos=permisos;
     inodo.ctime=time(NULL);

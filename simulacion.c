@@ -17,9 +17,8 @@ void reaper(){
 int main (int argc, char **argv){
     if (argc == 2){
       bmount(argv[1]);
-      bread(0, &SB);
       char camino[100];
-      memset(camino, 0, 100);
+      memset(camino, '\0', 100);
       time_t now = time (0);
       strftime (camino, 100, "/simul_%Y%m%d%H%M%S/", localtime (&now));
       printf ("Directorio: %s\n", camino);
@@ -30,45 +29,53 @@ int main (int argc, char **argv){
       for(int i = 1; i <= NUMPROCESOS; i++){
         pid = fork();  
         if(pid == 0){ //Es el hijo
+
           bmount(argv[1]);
+
           char camino_aux[100];
           memset(camino_aux, 0, 100);
           //char *camino_aux=malloc(sizeof(char));
-          //memset(camino_aux, 0, 100);
+          memset(camino_aux, '\0', 100);
           strcat(camino_aux, camino);
           strcat(camino_aux, "proceso_");
           char spid[10];
           sprintf(spid, "%d", getpid());
           strcat(camino_aux, spid);
           strcat(camino_aux, "/");
+          //printf("camino_aux: %s\n", camino_aux);
+
           mi_creat(camino_aux, 6);       
+
           //char *fichero = "prueba.dat";
           char final[100];
-          memset(final, 0, 100);
+          memset(final, '\0', 100);
           strcat(final,camino_aux);
           strcat(final, "prueba.dat");
-          int er = mi_creat(final,7);
+          //printf("final: %s\n", final);
+
+          int er = mi_creat(final,6);
           if(er != 1){
             bumount();
             exit(0);
           } else{
             // printf("Proceso %d: la creacion del archivo es correcta\n", i);
           }
+
           srand(time(NULL)+getpid());  
-          for(int j = 0; j < 50; j++){
+          for(int j = 0; j < NUM_ESCRITURAS; j++){
             struct REGISTRO reg;
             reg.fecha=time(NULL);
             reg.pid=getpid();
             reg.nEscritura=j+1;
             reg.nRegistro=rand()%REGMAX;
             //printf("proceso %d: valor de rand: %d\n", i, reg.nRegistro );
-            int erroro = mi_write(final, &reg, /*reg.nRegistro*/j*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
-            if (erroro  < 0){
+            int error = mi_write(final, &reg, reg.nRegistro*sizeof(struct REGISTRO), sizeof(struct REGISTRO));
+            if (error  < 0){
               printf("Proceso %d: Error de escritura\n", i);
             }
             sleep(0.05);
           }
-          printf("Proceso %d: Completadas las 50 escrituras en %s\n", i, final);  
+          printf("Proceso %d: Completadas las %d escrituras en %s\n", i, NUM_ESCRITURAS, final);  
           bumount();
           exit(0);
         }

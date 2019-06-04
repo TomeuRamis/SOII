@@ -3,7 +3,8 @@
 int main(int argc, char **argv){
 
     bmount(argv[1]);
-    bread(0, &SB);
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     
     printf("Posición posPrimerBloqueMB: %d\n", SB.posPrimerBloqueMB);
     printf("Posición posUltimoBloqueMB: %d\n", SB.posUltimoBloqueMB);

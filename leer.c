@@ -18,8 +18,7 @@ int main(int argc, char **argv){
         int ninodo = strtol(argv[2],NULL,0);
         unsigned char buffer_texto[TAMLEC];
 
-        bmount(argv[1]);
-        bread(0, &SB);    
+        bmount(argv[1]);   
         memset(buffer_texto,0,TAMLEC);          //Inicializamos el buffer con 0s
         leido_aux = mi_read_f(ninodo, buffer_texto, offset, TAMLEC); //Guardamos los bytes leeidos en leido_aux
         leer_inodo(ninodo, &inodo);

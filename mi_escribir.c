@@ -16,7 +16,6 @@ int main(int argc, char **argv){
             return 0;
         }else{
             bmount(argv[1]);
-            bread(0, &SB);
             char *texto= argv[3];
             printf("Longitud texto: %ld\n", strlen(texto));
             unsigned char buffer[strlen(texto)];

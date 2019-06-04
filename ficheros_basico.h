@@ -2,6 +2,7 @@
 #include <time.h>
 #include <limits.h>
 #define INODOSIZE 128
+#define POS_SB 0
 #define NPUNTEROS (BLOCKSIZE/sizeof(unsigned int)) //256
 #define DIRECTOS 12   
 #define INDIRECTOS0 (NPUNTEROS + DIRECTOS)    //268   
@@ -77,5 +78,5 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
 int liberar_inodo(unsigned int ninodo);
 int liberar_bloques_inodo(unsigned int ninodo, unsigned int nblogico);
 
-struct superbloque SB;
+//struct superbloque SB;
 struct inodo inodos [BLOCKSIZE/INODOSIZE];

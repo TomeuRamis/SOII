@@ -3,7 +3,6 @@ int cant_registros = 256;
 int main(int argc, char **argv){
     if (argc == 3){
         bmount(argv[1]);
-        bread(0,&SB);
         struct STAT stat;
         
         mi_stat(argv[2],&stat);
@@ -11,67 +10,71 @@ int main(int argc, char **argv){
         if(nentrada!=NUMPROCESOS){
             return -1;
         }
-        char *fichero=malloc(sizeof(char));
-        strcpy(fichero,argv[2]);
-        strcat(fichero, "informe.txt");
+        char fichero[100];
+        char directorio_padre[100];
+        strcpy(directorio_padre,argv[2]);
+        sprintf(fichero, "%sinforme.txt",directorio_padre);
         mi_creat(fichero, 6);
         struct entrada entrada;
         
         for(int i = 0; i < nentrada; i++){
             struct INFORMACION info;
-            char *compr = argv[2];
+            //struct REGISTRO buf;
+            struct REGISTRO big_buffer[TAM_BIG_BUF];
+            memset(big_buffer, 0, sizeof(big_buffer));
             mi_read(argv[2], &entrada, i*sizeof(struct entrada), sizeof(struct entrada));
             
-            char *pid = entrada.nombre;
-            char *inicio= malloc(sizeof(char));
-            inicio=strchr(pid,'_');
-            pid_t pidd = atoi(inicio+1);
-            struct REGISTRO buf;
-            char *camino_prueba;
-            strcat(camino_prueba, argv[2]);
-            strcat(camino_prueba, entrada.nombre);
-            strcat(camino_prueba,"/prueba.dat");
+            char *entr = entrada.nombre;
+            pid_t pid = atoi(strchr(entr,'_')+1);
+            
+            char camino_prueba[100];
+            sprintf(camino_prueba, "%s%s/prueba.dat", directorio_padre, entrada.nombre);
+
             int escrituras_validadas = 0;
             int pos=0;
-            while( mi_read(camino_prueba,&buf,pos*sizeof(struct REGISTRO),sizeof(struct REGISTRO))> 0){
-                if(pidd==buf.pid){
-                    if(escrituras_validadas == 0){
-                        info.MenorPosicion=buf;
-                        info.MayorPosicion=buf;
-                        info.PrimeraEscritura=buf;
-                        info.UltimaEscritura=buf;
-                    }
-                    else{
-                        if(difftime(info.UltimaEscritura.fecha, buf.fecha) < 0){
-                            info.UltimaEscritura = buf;
-                        } else if(difftime(info.UltimaEscritura.fecha, buf.fecha)==0){
-                            if(info.UltimaEscritura.nEscritura < buf.nEscritura) {
-                                info.UltimaEscritura = buf;
+            while( mi_read(camino_prueba,&big_buffer,pos*sizeof(struct REGISTRO),sizeof(struct REGISTRO)*TAM_BIG_BUF)> 0){
+                for(int j = 0; j < TAM_BIG_BUF; j++){
+                    if(pid==big_buffer[j].pid){
+                        if(escrituras_validadas == 0){
+                            info.MenorPosicion=big_buffer[j];
+                            info.MayorPosicion=big_buffer[j];
+                            info.PrimeraEscritura=big_buffer[j];
+                            info.UltimaEscritura=big_buffer[j];
+                        }
+                        else{
+                            if(difftime(info.UltimaEscritura.fecha, big_buffer[j].fecha) < 0){
+                                info.UltimaEscritura = big_buffer[j];
+                            } else if(difftime(info.UltimaEscritura.fecha, big_buffer[j].fecha)==0){
+                                if(info.UltimaEscritura.nEscritura < big_buffer[j].nEscritura) {
+                                    info.UltimaEscritura = big_buffer[j];
+                                }
+                            }
+                            if(difftime(info.PrimeraEscritura.fecha, big_buffer[j].fecha) > 0){
+                                info.PrimeraEscritura=big_buffer[j];
+                            } else if(difftime(info.PrimeraEscritura.fecha, big_buffer[j].fecha)==0){
+                                if(info.PrimeraEscritura.nEscritura > big_buffer[j].nEscritura) {
+                                    info.PrimeraEscritura = big_buffer[j];
+                                }
                             }
                         }
-                        if(difftime(info.PrimeraEscritura.fecha, buf.fecha) > 0){
-                            info.PrimeraEscritura=buf;
-                        } else if(difftime(info.PrimeraEscritura.fecha, buf.fecha)==0){
-                            if(info.PrimeraEscritura.nEscritura > buf.nEscritura) {
-                                info.PrimeraEscritura = buf;
-                            }
-                        }
+                        info.MayorPosicion = big_buffer[j];
+                        escrituras_validadas++;
                     }
-                    info.MayorPosicion = buf;
-                    escrituras_validadas++;
-                }
-                pos++;   
+                    pos++;  
+                } 
+                memset(big_buffer, 0, sizeof(big_buffer));
             }
             info.nEscrituras=escrituras_validadas;
-            printf("%d) %d escrituras validadas en %s", i, escrituras_validadas, camino_prueba);
-            char *aux = malloc(sizeof(char));
-            sprintf(aux, "\nPID: %d\nNumero escrituras: %d\nPrimera escritura\t%d\t%d %s\nUltima escritura\t%d\t%d %d\nMenor escritura\t%d\t%d %d\nMayor escritura\t%d\t%d %d\n",
+            info.pid=pid;
+            printf("%d) %d escrituras validadas en %s\n", i, escrituras_validadas, camino_prueba);
+            char aux[1000];
+            sprintf(aux, "PID: %d\nNumero escrituras: %d\nPrimera escritura\t%d\t%d %sUltima escritura\t%d\t%d %sMenor escritura         %d\t%d %sMayor escritura         %d\t%d %s\n",
             info.pid,info.nEscrituras,info.PrimeraEscritura.nEscritura, info.PrimeraEscritura.nRegistro,asctime(localtime(&info.PrimeraEscritura.fecha)), 
             info.UltimaEscritura.nEscritura, info.UltimaEscritura.nRegistro, asctime(localtime(&info.UltimaEscritura.fecha)), info.MenorPosicion.nEscritura, 
             info.MenorPosicion.nRegistro, asctime(localtime(&info.MenorPosicion.fecha)), info.MayorPosicion.nEscritura, info.MayorPosicion.nRegistro, 
             asctime(localtime(&info.MayorPosicion.fecha)));
 
-            mi_write(fichero, aux, i*sizeof(&aux), sizeof(struct INFORMACION));
+            mi_write(fichero, &aux, i*sizeof(aux), strlen(aux));
         }
         bumount();
     }else{

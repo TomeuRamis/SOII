@@ -1,6 +1,6 @@
 #include "directorios.h"
 
-int tambuffer = 1500;
+int tambuffer = 1024;
 
 int main(int argc, char **argv){
     if (argc == 3){
@@ -25,7 +25,7 @@ int main(int argc, char **argv){
             char *camino=argv[2];
 
             bmount(argv[1]);
-            bread(0, &SB);  
+ 
             memset(buffer_texto,0,tambuffer);          //Inicializamos el buffer con 0s
             leido_aux = mi_read(camino, &buffer_texto, offset, tambuffer); //Guardamos los bytes leeidos en leido_aux
             while(0 < leido_aux){ 

@@ -18,9 +18,11 @@ int tamAI(unsigned int ninodos){
 }
 
 int initSB(unsigned int nbloques, unsigned int ninodos){
-    int posSB = 0;
+    struct superbloque SB;
+    bread(POS_SB, &SB);
+
     int tamSB = 1;
-    SB.posPrimerBloqueMB = posSB + tamSB; //posSB = 0, tamSB = 1
+    SB.posPrimerBloqueMB = POS_SB + tamSB; //posSB = 0, tamSB = 1
     SB.posUltimoBloqueMB = SB.posPrimerBloqueMB+tamMB(nbloques)-1;
     SB.posPrimerBloqueAI = SB.posUltimoBloqueMB+1;
     SB.posUltimoBloqueAI = SB.posPrimerBloqueAI+tamAI(ninodos)-1;
@@ -33,11 +35,13 @@ int initSB(unsigned int nbloques, unsigned int ninodos){
     SB.totBloques = nbloques;
     SB.totInodos = ninodos;
     SB.cantBloquesLibres = SB.cantBloquesLibres - tamSB;
-    bwrite(posSB, &SB);
+    bwrite(POS_SB, &SB);
     return 0;
 }
 
 int initMB(){  
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     unsigned char buf[BLOCKSIZE];
     memset(buf, 0, BLOCKSIZE);
     for (int i = SB.posPrimerBloqueMB; i <= SB.posUltimoBloqueMB ; i++){
@@ -52,6 +56,8 @@ int initMB(){
 }
 
 int initAI(){
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     int contInodos = SB.posPrimerInodoLibre +1;
     for(int i= SB.posPrimerBloqueAI; i <= SB.posUltimoBloqueAI;i++){
         for(int j=0;j<(BLOCKSIZE/INODOSIZE);j++){
@@ -70,6 +76,8 @@ int initAI(){
 }
 
 int escribir_bit(unsigned int nbloque, unsigned int bit){
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     unsigned char mascara = 128; //10000000
 
     int posbyte = nbloque / 8;
@@ -91,6 +99,8 @@ int escribir_bit(unsigned int nbloque, unsigned int bit){
 }
 
 unsigned char leer_bit (unsigned int nbloque){ 
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     unsigned char mascara = 128;
 
     int posbyte = nbloque / 8;
@@ -108,6 +118,8 @@ unsigned char leer_bit (unsigned int nbloque){
 
 int reservar_bloque(){
 
+struct superbloque SB;
+bread(POS_SB, &SB);
     if(SB.cantBloquesLibres > 0){
         int encontrado = 0; // 0 -> False; 1 -> True 
         int nbloque = 0;         
@@ -149,13 +161,17 @@ int reservar_bloque(){
 }
 
 int liberar_bloque(unsigned int nbloque){ 
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     escribir_bit(nbloque,0);
     SB.cantBloquesLibres++;
     bwrite(0, &SB);
     return nbloque;
 }
 
-int escribir_inodo(unsigned int ninodo, struct inodo inodo){ 
+int escribir_inodo(unsigned int ninodo, struct inodo inodo){
+    struct superbloque SB;
+    bread(POS_SB, &SB); 
 
     int posBloqueInodo =  SB.posPrimerBloqueAI + (ninodo/8); 
     struct inodo ino2[BLOCKSIZE/INODOSIZE];
@@ -168,6 +184,8 @@ int escribir_inodo(unsigned int ninodo, struct inodo inodo){
 }
 
 int leer_inodo(unsigned int ninodo, struct inodo *inodo){
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     int posBloqueInodo = SB.posPrimerBloqueAI + (ninodo/8); 
     struct inodo inodos[BLOCKSIZE/INODOSIZE];
     bread(posBloqueInodo,inodos);
@@ -180,8 +198,11 @@ int leer_inodo(unsigned int ninodo, struct inodo *inodo){
 }
 
 int reservar_inodo(char tipo, unsigned char permisos){
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     if(SB.cantInodosLibres > 0){
         int posInodoReservado = SB.posPrimerInodoLibre;
+        //printf("Posicion del primer inodo libre: %d\n", posInodoReservado);
         struct inodo inodo;
         inodo.tipo = tipo;
         inodo.permisos = permisos;
@@ -197,10 +218,13 @@ int reservar_inodo(char tipo, unsigned char permisos){
         for(int i = 0; i <= 3; i++){
             inodo.punterosIndirectos[i] = 0;
         }
+        //mi_waitSem(); //No deberian estar aqui, pero funciona mejor con los semaforos que sin ellos
         escribir_inodo(posInodoReservado, inodo);
-        SB.posPrimerInodoLibre++;
-        SB.cantInodosLibres--;
+        SB.posPrimerInodoLibre = SB.posPrimerInodoLibre + 1;
+        SB.cantInodosLibres = SB.cantInodosLibres - 1;  
+        //printf("Primer inodo libre: %d\nCantidad inodos libres %d\n", SB.posPrimerInodoLibre, SB.cantInodosLibres);
         bwrite(0, &SB);
+        //mi_signalSem();
         return posInodoReservado;
     } else {
         printf("No quedan inodos libres");
@@ -316,6 +340,8 @@ int traducir_bloque_inodo(unsigned int ninodo, unsigned int nblogico, char reser
 }
 
 int liberar_inodo(unsigned int ninodo){
+    struct superbloque SB;
+    bread(POS_SB, &SB);
     struct inodo inodo;
     int liberados = liberar_bloques_inodo(ninodo,0);
     leer_inodo(ninodo,&inodo);

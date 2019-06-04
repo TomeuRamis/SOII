@@ -3,7 +3,6 @@
 int main(int argc, char **argv){
     if (argc == 3){
         bmount(argv[1]);
-        bread(0, &SB);
         char *camino = argv[2];
         if (strcmp(camino,"/")!=0){
             mi_unlink(argv[2]); 
