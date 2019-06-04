@@ -1,6 +1,7 @@
 #include "simulacion.h"
 #include <stdlib.h> 
 
+
 static int acabados =0;
 
 void reaper(){
@@ -61,10 +62,15 @@ int main (int argc, char **argv){
             // printf("Proceso %d: la creacion del archivo es correcta\n", i);
           }
 
-          srand(time(NULL)+getpid());  
+          srand(time(NULL)+getpid()); 
           for(int j = 0; j < NUM_ESCRITURAS; j++){
             struct REGISTRO reg;
             reg.fecha=time(NULL);
+            //ALTERNATIVA
+            /*struct timeb tm;  
+            ftime(&tm);
+            reg.fecha = tm;*/
+            //FN ALTERNATIVA
             reg.pid=getpid();
             reg.nEscritura=j+1;
             reg.nRegistro=rand()%REGMAX;

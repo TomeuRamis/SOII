@@ -42,19 +42,27 @@ int main(int argc, char **argv){
                             info.UltimaEscritura=big_buffer[j];
                         }
                         else{
-                            if(difftime(info.UltimaEscritura.fecha, big_buffer[j].fecha) < 0){
+                            if(difftime(info.UltimaEscritura.fecha/*.time*/, big_buffer[j].fecha/*.time*/) < 0){ //Comparamos la fecha
                                 info.UltimaEscritura = big_buffer[j];
-                            } else if(difftime(info.UltimaEscritura.fecha, big_buffer[j].fecha)==0){
-                                if(info.UltimaEscritura.nEscritura < big_buffer[j].nEscritura) {
+                            } else if(difftime(info.UltimaEscritura.fecha/*.time*/, big_buffer[j].fecha/*.time*/)==0){
+                                /*if((info.UltimaEscritura.fecha.millitm - big_buffer[j].fecha.millitm) < 0){ //Comparamos los milisegundos
                                     info.UltimaEscritura = big_buffer[j];
-                                }
+                                } else if ((info.UltimaEscritura.fecha.millitm - big_buffer[j].fecha.millitm) == 0){*/
+                                    if(info.UltimaEscritura.nEscritura < big_buffer[j].nEscritura) {
+                                        info.UltimaEscritura = big_buffer[j];
+                                    }
+                                /*}*/
                             }
-                            if(difftime(info.PrimeraEscritura.fecha, big_buffer[j].fecha) > 0){
+                            if(difftime(info.PrimeraEscritura.fecha/*.time*/, big_buffer[j].fecha/*.time*/) > 0){
                                 info.PrimeraEscritura=big_buffer[j];
-                            } else if(difftime(info.PrimeraEscritura.fecha, big_buffer[j].fecha)==0){
-                                if(info.PrimeraEscritura.nEscritura > big_buffer[j].nEscritura) {
-                                    info.PrimeraEscritura = big_buffer[j];
-                                }
+                            } else if(difftime(info.PrimeraEscritura.fecha/*.time*/, big_buffer[j].fecha/*.time*/)==0){
+                                /*if((info.PrimeraEscritura.fecha.millitm - big_buffer[j].fecha.millitm) > 0){
+                                    info.PrimeraEscritura=big_buffer[j];
+                                } else if((info.PrimeraEscritura.fecha.millitm - big_buffer[j].fecha.millitm) == 0){*/
+                                    if(info.PrimeraEscritura.nEscritura > big_buffer[j].nEscritura) {
+                                        info.PrimeraEscritura = big_buffer[j];
+                                    }
+                                /*}*/
                             }
                         }
                         info.MayorPosicion = big_buffer[j];
@@ -69,10 +77,10 @@ int main(int argc, char **argv){
             printf("%d) %d escrituras validadas en %s\n", i, escrituras_validadas, camino_prueba);
             char aux[1000];
             sprintf(aux, "PID: %d\nNumero escrituras: %d\nPrimera escritura\t%d\t%d %sUltima escritura\t%d\t%d %sMenor escritura         %d\t%d %sMayor escritura         %d\t%d %s\n",
-            info.pid,info.nEscrituras,info.PrimeraEscritura.nEscritura, info.PrimeraEscritura.nRegistro,asctime(localtime(&info.PrimeraEscritura.fecha)), 
-            info.UltimaEscritura.nEscritura, info.UltimaEscritura.nRegistro, asctime(localtime(&info.UltimaEscritura.fecha)), info.MenorPosicion.nEscritura, 
-            info.MenorPosicion.nRegistro, asctime(localtime(&info.MenorPosicion.fecha)), info.MayorPosicion.nEscritura, info.MayorPosicion.nRegistro, 
-            asctime(localtime(&info.MayorPosicion.fecha)));
+            info.pid,info.nEscrituras,info.PrimeraEscritura.nEscritura, info.PrimeraEscritura.nRegistro,asctime(localtime(&info.PrimeraEscritura.fecha/*.time*/)),/*info.PrimeraEscritura.fecha.millitm,*/ 
+            info.UltimaEscritura.nEscritura, info.UltimaEscritura.nRegistro, asctime(localtime(&info.UltimaEscritura.fecha/*.time*/)),/*info.PrimeraEscritura.fecha.millitm,*/ info.MenorPosicion.nEscritura, 
+            info.MenorPosicion.nRegistro, asctime(localtime(&info.MenorPosicion.fecha/*.time*/)),/*info.MenorPosicion.fecha.millitm,*/ info.MayorPosicion.nEscritura, info.MayorPosicion.nRegistro, 
+            asctime(localtime(&info.MayorPosicion.fecha/*.time*/))/*, info.MayorPosicion.fecha.millitm*/);
 
             mi_write(fichero, &aux, i*sizeof(aux), strlen(aux));
         }
