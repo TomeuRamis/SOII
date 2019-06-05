@@ -200,16 +200,16 @@ int mi_read(const char *camino, void *buf, unsigned int offset, unsigned int nby
     unsigned int p_inodo = 0;
     unsigned int p_entrada =0;
     unsigned int p_inodo_dir =0;
-    mi_waitSem();
+    //mi_waitSem();
     int error = buscar_entrada(camino,&p_inodo_dir,&p_inodo,&p_entrada,0,4);
     if (error ==1){
         //printf("Llego a: inicio lectura");
         int bytesleidos= mi_read_f(p_inodo,buf,offset,nbytes);
-        mi_signalSem();
+        //mi_signalSem();
         return bytesleidos;
     } else {
         //printf("NO se ha encontrado entrada");
-        mi_signalSem();
+        //mi_signalSem();
         return -1;
     }
 }

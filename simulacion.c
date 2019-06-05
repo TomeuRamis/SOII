@@ -79,13 +79,13 @@ int main (int argc, char **argv){
             if (error  < 0){
               printf("Proceso %d: Error de escritura\n", i);
             }
-            sleep(0.05);
+            usleep(50000);
           }
           printf("Proceso %d: Completadas las %d escrituras en %s\n", i, NUM_ESCRITURAS, final);  
           bumount();
           exit(0);
         }
-        sleep(0.2);
+        usleep(200000);
       }
       while(acabados< NUMPROCESOS){
         pause();
